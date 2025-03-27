@@ -26,16 +26,10 @@ func (a *AuthRoute) RegisterAuthRoute() *AuthRoute {
 	return a
 }
 
-// POST /auth/register → Register a new user
+// POST /admin/auth/login → Admin login and get a token
 
-// POST /auth/login → Login and get a token
+// POST /admin/auth/logout → Admin logout
 
-// POST /auth/logout → Logout user
+// GET /admin/auth/profile → Get admin profile
 
-// GET /auth/profile → Get user profile
-
-// PUT /auth/profile → Update user profile
-
-// POST /auth/forgot-password → Request password reset
-
-// POST /auth/reset-password → Reset password
+// PUT /admin/auth/profile → Update admin profile
