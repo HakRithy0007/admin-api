@@ -13,19 +13,19 @@ import (
 
 func main() {
 
-	// Initial configuration
+	// Initial configurations
 	app_configs := configs.NewConfig()
 
-	// Initial database
+	// Initial databases
 	db_pool := database.GetDB()
 
-	// Initialize router
+	// Initialize routers
 	app := routers.New(db_pool)
 
-	// Initialize redis client
+	// Initialize redis clients
 	rdb := redis.NewRedisClient()
 
-	// Initialize the translate
+	// Initialize the translates
 	if err := translate.Init(); err != nil {
 		custom_log.NewCustomLog("Failed_initialize_i18n", err.Err.Error(), "error")
 	}
@@ -33,5 +33,5 @@ func main() {
 	handler.NewFrontService(app, db_pool, rdb)
 
 	app.Listen(fmt.Sprintf("%s:%d", app_configs.AppHost, app_configs.AppPort))
-	
+
 }
