@@ -33,4 +33,5 @@ func main() {
 	handler.NewFrontService(app, db_pool, rdb)
 
 	app.Listen(fmt.Sprintf("%s:%d", app_configs.AppHost, app_configs.AppPort))
+	
 }
