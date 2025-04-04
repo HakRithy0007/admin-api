@@ -16,14 +16,13 @@ type AuthHandler struct {
 	authService AuthService
 }
 
-// NewAuthHandler creates a new instance of AuthHandler
 func NewAuthHandler(dbPool *sqlx.DB, redisClient *redis.Client) *AuthHandler {
 	return &AuthHandler{
 		authService: NewAuthService(dbPool, redisClient),
 	}
 }
 
-// Login handles user login request
+// Login 
 func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	v := custom_validator.NewValidator()
 	req := &AuthLoginRequest{}

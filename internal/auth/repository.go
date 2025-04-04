@@ -38,6 +38,7 @@ func NewAuthRepository(dbPool *sqlx.DB, redisClient *redis.Client) AuthRepositor
 	}
 }
 
+// Login
 func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *error.ErrorResponse) {
 	var user UserData
 	msg := error.ErrorResponse{}
@@ -81,7 +82,7 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	redisUtil := redis_util.NewRedisUtil(a.redis)
 	redisUtil.SetCacheKey(key, claims, context.Background())
 
-	_ = godotenv.Load() // Ignore error if .env file not found
+	_ = godotenv.Load()
 
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 
@@ -116,6 +117,7 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	return &res, nil
 }
 
+// CheckSession
 func (a *authRepositoryImpl) CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse) {
 	msg := error.ErrorResponse{}
 

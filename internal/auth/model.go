@@ -14,7 +14,7 @@ type AuthLoginRequest struct {
 	} `json:"auth"`
 }
 
-// bind validates and parses the login request
+// Bind request payload 
 func (r *AuthLoginRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.BodyParser(r); err != nil {
 		return err
