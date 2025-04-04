@@ -39,23 +39,23 @@ func NewAuthRepository(dbPool *sqlx.DB, redisClient *redis.Client) AuthRepositor
 }
 
 func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *error.ErrorResponse) {
-	var member MemberData
+	var user UserData
 	msg := error.ErrorResponse{}
 
 	query := `
 		SELECT
 			id, 
-			user_name,
+			username,
 			email,
 			password
-		FROM tbl_members 
-		WHERE user_name = $1 AND password = $2 AND deleted_at IS NULL
+		FROM tbl_users 
+		WHERE username = $1 AND password = $2
 	`
 
-	err := a.dbPool.Get(&member, query, username, password)
+	err := a.dbPool.Get(&user, query, username, password)
 	if err != nil {
-		custom_log.NewCustomLog("member_not_found", err.Error(), "error")
-		return nil, msg.NewErrorResponse("member_not_found", fmt.Errorf("member not found. Please check the provided information"))
+		custom_log.NewCustomLog("user", err.Error(), "error")
+		return nil, msg.NewErrorResponse("user", fmt.Errorf("user not found. Please check the provided information"))
 	}
 
 	var res AuthResponse
@@ -70,14 +70,14 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	}
 
 	claims := jwt.MapClaims{
-		"player_id":     member.ID,
-		"username":      member.Username,
+		"player_id":     user.ID,
+		"username":      user.Username,
 		"login_session": loginSession.String(),
 		"exp":           expirationTime.Unix(),
 	}
 
 	// Set Redis Data
-	key := fmt.Sprintf("member_info_id: %d", member.ID)
+	key := fmt.Sprintf("user: %d", user.ID)
 	redisUtil := redis_util.NewRedisUtil(a.redis)
 	redisUtil.SetCacheKey(key, claims, context.Background())
 
@@ -86,11 +86,11 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 
 	updateQuery := `	
-		UPDATE tbl_members
+		UPDATE tbl_users
 		SET login_session = $1
 		WHERE id = $2
 	`
-	_, err = a.dbPool.Exec(updateQuery, loginSession.String(), member.ID)
+	_, err = a.dbPool.Exec(updateQuery, loginSession.String(), user.ID)
 	if err != nil {
 		custom_log.NewCustomLog("session_update_failed", err.Error(), "error")
 		return nil, msg.NewErrorResponse("session_update_failed", fmt.Errorf("cannot update session"))
@@ -106,8 +106,8 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	res.Auth.Token = tokenString
 	res.Auth.TokenType = "jwt"
 
-	auditDesc := fmt.Sprintf(`Member : %s has been login to the system`, username)
-	_, err = audit.AddMemeberAuditLog(member.ID, "Login", auditDesc, 1, "userAgent", member.Username, "ip", member.ID, a.dbPool)
+	auditDesc := fmt.Sprintf(`User : %s has been login to the system`, username)
+	_, err = audit.AddMemeberAuditLog(user.ID, "Login", auditDesc, 1, "userAgent", user.Username, "ip", user.ID, a.dbPool)
 	if err != nil {
 		custom_log.NewCustomLog("add_audit_log_failed", err.Error(), "error")
 		return nil, msg.NewErrorResponse("add_audit_log_failed", fmt.Errorf("cannot insert data to audit log"))
@@ -116,10 +116,10 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	return &res, nil
 }
 
-func (a *authRepositoryImpl) CheckSession(loginSession string, memberID float64) (bool, *error.ErrorResponse) {
+func (a *authRepositoryImpl) CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse) {
 	msg := error.ErrorResponse{}
 
-	key := fmt.Sprintf("member: %d", int(memberID))
+	key := fmt.Sprintf("user: %d", int(userID))
 	redisUtil := redis_util.NewRedisUtil(a.redis)
 
 	keyData, err := redisUtil.GetCacheKey(key, context.Background())
@@ -133,7 +133,7 @@ func (a *authRepositoryImpl) CheckSession(loginSession string, memberID float64)
 
 	query := `
 		SELECT login_session
-		FROM tbl_members
+		FROM tbl_users
 		WHERE login_session = $1
 	`
 	err = a.dbPool.Get(&storedLoginSession, query, loginSession)

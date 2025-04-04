@@ -1,0 +1,6 @@
+# Auth
+login_invalid: "Invalid username or password"
+user_not_found: "User not found"
+session_update_failed: "Session update failed"
+add_audit_log_failed: "Failed to add audit log"
+login_success: "Login successful"

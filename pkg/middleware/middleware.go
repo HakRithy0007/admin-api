@@ -88,7 +88,7 @@ func handleUserContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *r
 		return c.Status(http.StatusUnprocessableEntity).JSON(smg_error)
 	}
 
-	uCtx := custom_models.PlayerContext{
+	uCtx := custom_models.UserContext{
 		PlayerID:     uclaim["player_id"].(float64),
 		UserName:     uclaim["username"].(string),
 		LoginSession: uclaim["login_session"].(string),

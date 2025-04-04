@@ -2,7 +2,7 @@ package custom_models
 
 import "time"
 
-type PlayerContext struct {
+type UserContext struct {
 	PlayerID     float64   `json:"player_id"`
 	UserName     string    `json:"user_name"`
 	LoginSession string    `json:"login_session"`

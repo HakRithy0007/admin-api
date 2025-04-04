@@ -9,8 +9,8 @@ import (
 // AuthLoginRequest represents the login request payload
 type AuthLoginRequest struct {
 	Auth struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
+		Username string `json:"username" db:"username" validate:"required"`
+		Password string `json:"password" db:"password" validate:"required"`
 	} `json:"auth"`
 }
 
@@ -32,11 +32,11 @@ type AuthResponse struct {
 	} `json:"auths"`
 }
 
-type MemberData struct {
-	ID       int    `db:"id"`
-	Username string `db:"user_name"`
-	Email    string `db:"email"`
-	Password string `db:"password"`
+type UserData struct {
+	ID       int    `db:"id" json:"id"`
+	Username string `db:"username" json:"username"`
+	Email    string `db:"email" json:"email"`
+	Password string `db:"password" json:"password"`
 }
 
 type RedisSession struct {
