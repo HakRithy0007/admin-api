@@ -151,3 +151,4 @@ func (a *authRepositoryImpl) CheckSession(loginSession string, userID float64) (
 	}
 	return true, nil
 }
+
