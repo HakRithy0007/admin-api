@@ -83,7 +83,6 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	redisUtil.SetCacheKey(key, claims, context.Background())
 
 	_ = godotenv.Load()
-
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 
 	updateQuery := `	
