@@ -7,6 +7,7 @@ import (
 
 	auth "admin-phone-shop-api/internal/auth"
 	middleware "admin-phone-shop-api/pkg/middleware"
+	users "admin-phone-shop-api/internal/users"
 )
 
 type ServiceHandlers struct {
@@ -15,6 +16,7 @@ type ServiceHandlers struct {
 
 type FrontService struct {
 	AuthHandler *auth.AuthRoute
+	UserHandler *users.UserRoute
 }
 
 func NewFrontService(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) *FrontService {
@@ -25,8 +27,13 @@ func NewFrontService(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) *Fro
 	// Middleware
 	middleware.NewJwtMinddleWare(app, db_pool, redis)
 
+	// User
+	users := users.NewUserRoute(app, db_pool, redis).RegisterUserRoute()
+	
+
 	return &FrontService{
 		AuthHandler: auth,
+		UserHandler: users,
 	}
 }
 
