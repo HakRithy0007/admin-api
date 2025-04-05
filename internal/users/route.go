@@ -1,20 +1,22 @@
 package users
 
 import (
-	"github.com/redis/go-redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 )
 
 type UserRoute struct {
 	app     *fiber.App
+	dbPool  *sqlx.DB
 	handler *UserHandler
 }
 
-func NewUserRoute(app *fiber.App, dbPool *sqlx.DB, redisClient *redis.Client) *UserRoute {
+func NewUserRoute(app *fiber.App, dbPool *sqlx.DB) *UserRoute {
+	handler := NewUserHandler(dbPool)
 	return &UserRoute{
 		app: app,
-		handler: NewUserRoute(dbPool, redisClient),
+		dbPool: dbPool,
+		handler: handler,
 	}
 }
 
@@ -23,7 +25,7 @@ func (u *UserRoute) RegisterUserRoute() *UserRoute {
 	users := v1.Group("/admin/users")
 
 	// Show all users
-	users.Get("/show", u.handler.show)
+	users.Get("/show", u.handler.ShowAllUsers)
 
 	return u
 }

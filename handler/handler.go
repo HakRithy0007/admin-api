@@ -28,7 +28,7 @@ func NewFrontService(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) *Fro
 	middleware.NewJwtMinddleWare(app, db_pool, redis)
 
 	// User
-	users := users.NewUserRoute(app, db_pool, redis).RegisterUserRoute()
+	users := users.NewUserRoute(app, db_pool).RegisterUserRoute()
 	
 
 	return &FrontService{

@@ -12,4 +12,6 @@ const (
 	Invalid_request		= 3305
 	Show_user_audit_Failed = 3306
 	Show_user_success	= 3307
+
+	Show_user_Failed	= 3308
 )
