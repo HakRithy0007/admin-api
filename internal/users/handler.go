@@ -35,4 +35,6 @@ func NewUserHandler(dbPool *sqlx.DB, redisClient *redis.Client) *UserHandler {
 // Show all Users
 func (u *UserHandler) ShowAllUsers(c *fiber.Ctx) error {
 	var userRequest ShowUserRequest
+
+	
 }
