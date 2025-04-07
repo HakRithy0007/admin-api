@@ -22,15 +22,22 @@ func NewUserHandler(dbPool *sqlx.DB) *UserHandler {
 		dbPool: dbPool,
 		userService: func(c *fiber.Ctx) UserCreator {
 			context := c.Locals("UserContext")
-			var uCtx model.UserContext
-			if contextMap, ok := context.(model.UserContext); ok {
-				uCtx = contextMap
+			var uCtx *model.UserContext
+			
+			// Fix the type assertion
+			if contextPtr, ok := context.(*model.UserContext); ok {
+				// Direct pointer cast was successful
+				uCtx = contextPtr
+			} else if contextVal, ok := context.(model.UserContext); ok {
+				// Value cast was successful, convert to pointer
+				uCtx = &contextVal
 			} else {
-				custom_log.NewCustomLog("get_user_context_failed", "Failed to cast UserContext to map[string]interface{}", "warn")
-				uCtx = model.UserContext{}
+				// Log the failure and create an empty context
+				custom_log.NewCustomLog("get_user_context_failed", "Failed to cast UserContext from Locals", "warn")
+				uCtx = &model.UserContext{}
 			}
 
-			return NewUserService(&uCtx, dbPool)
+			return NewUserService(uCtx, dbPool)
 		},
 	}
 }

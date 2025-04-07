@@ -4,29 +4,28 @@ import (
 	model "admin-phone-shop-api/pkg/model"
 	"fmt"
 	"strconv"
+	"time"
 
 	custom_validator "admin-phone-shop-api/pkg/validator"
+
 	"github.com/gofiber/fiber/v2"
 )
 
 type User struct {
-	ID           int     `db:"id" json:"id"`
-	FirstName    string  `db:"first_name" json:"first_name"`
-	LastName     string  `db:"last_name" json:"last_name"`
-	Username     string  `db:"user_name" json:"username"`
-	Email        string  `db:"email" json:"email"`
-	LoginSession *string `db:"login_session" json:"-"`
-	Phone        string  `db:"phone" json:"phone"`
-	Password     string  `db:"password" json:"-"`
-	StatusID     int     `db:"status_id" json:"status_id"`
-	CreatedAt    string  `db:"created_at" json:"created_at"`
-	CreatedBy    int     `db:"created_by" json:"created_by"`
-	DeletedAt    *string `db:"deleted_at" json:"-"`
-	RoleID       int     `db:"role_id" json:"role_id"`
-	UserRoleName string  `db:"user_role_name" json:"user_role_name"`
-	Operator     string  `json:"operator" db:"operator"`
+	ID           int        `db:"id"`
+	FirstName    string     `db:"first_name"`
+	LastName     string     `db:"last_name"`
+	UserName     string     `db:"user_name"`
+	Email        string     `db:"email"`
+	Phone        string     `db:"phone"`
+	StatusID     int        `db:"status_id"`
+	CreatedAt    time.Time  `db:"created_at"`
+	DeletedAt    *time.Time `db:"deleted_at"` // pointer because nullable
+	CreatedBy    int        `db:"created_by"`
+	RoleID       int        `db:"role_id"`
+	UserRoleName string     `db:"user_role_name"`
+	Operator     string     `db:"operator"`
 }
-
 
 type ShowUserRequest struct {
 	PagingOption model.PagingOption `json:"paging_options" query:"paging_options"`
@@ -36,7 +35,7 @@ type ShowUserRequest struct {
 
 type ShowUserResponse struct {
 	Users []User `json:"users"`
-	Total int         `json:"total"`
+	Total int    `json:"total"`
 }
 
 type TotalRecord struct {
