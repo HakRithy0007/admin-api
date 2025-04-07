@@ -26,6 +26,7 @@ func NewUserRepoImpl(uCtx *model.UserContext, db_pool *sqlx.DB) *UserRepoImpl {
 	}
 }
 
+// Show all user
 func (u *UserRepoImpl) ShowAllUser(userReqest ShowUserRequest) (*ShowUserResponse, *error.ErrorResponse) {
 
 	err_msg := &error.ErrorResponse{}

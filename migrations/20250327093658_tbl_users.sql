@@ -1,9 +1,13 @@
 -- +goose Up
 CREATE TABLE tbl_users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
+    first_name VARCHAR(20) DEFAULT NULL,
+    last_name VARCHAR(20) DEFAULT NULL,
+    user_name VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15) DEFAULT NULL,
+     is_admin SMALLINT DEFAULT 0,
     login_session TEXT NULL,
     last_access TIMESTAMP WITHOUT TIME ZONE,
     profile_photo TEXT NULL,
@@ -19,7 +23,7 @@ CREATE TABLE tbl_users (
 );
 
 -- +goose StatementBegin
-INSERT INTO tbl_users (username, password, email) VALUES
+INSERT INTO tbl_users (user_name, password, email) VALUES
     ('ADMIN1', '123456', 'admin1@example.com'),
     ('ADMIN2', '123456', 'admin2@example.com'),
     ('ADMIN3', '123456', 'admin3@example.com'),
