@@ -39,6 +39,10 @@ type ShowUserResponse struct {
 	Total int         `json:"total"`
 }
 
+type TotalRecord struct {
+	Total int `db:"total"`
+}
+
 func (u *ShowUserRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.QueryParser(u); err != nil {
 		return err

@@ -22,10 +22,10 @@ func NewUserRoute(app *fiber.App, dbPool *sqlx.DB) *UserRoute {
 
 func (u *UserRoute) RegisterUserRoute() *UserRoute {
 	v1 := u.app.Group("api/v1")
-	users := v1.Group("/admin/users")
+	users := v1.Group("/users")
 
 	// Show all users
-	users.Get("/show", u.handler.ShowAllUsers)
+	users.Get("/", u.handler.ShowAllUsers)
 
 	return u
 }
