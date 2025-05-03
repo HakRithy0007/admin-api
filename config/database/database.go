@@ -15,17 +15,17 @@ var (
 )
 
 func initializeDB() {
-	DATABASE_URL := os.Getenv("DATABASE_URL")
+	DATATBASE_URL := os.Getenv("DATABASE_URL")
 	var err_db error
 
-	db_pool, err_db = sqlx.Connect("postgres", DATABASE_URL)
+	db_pool, err_db = sqlx.Connect("postgres", DATATBASE_URL)
 	if err_db != nil {
 		log.Fatalln("Error connection to the database", err_db)
 	}
 
 	if err := db_pool.Ping(); err != nil {
 		defer db_pool.Close()
-		log.Fatalf("Failed to ping the database: %v", err)
+		log.Fatalf("Failed to ping the database : %v", err)
 	}
 
 	// Set connection pool settings

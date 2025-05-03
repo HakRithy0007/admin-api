@@ -1,4 +1,4 @@
-package configs
+package redis_config
 
 import (
 	env "admin-phone-shop-api/pkg/utils/env"
@@ -26,13 +26,13 @@ func InitRedis() *RedisConfig {
 	redis_port := os.Getenv("REDIS_PORT")
 	redis_password := os.Getenv("REDIS_PASSWORD")
 	redis_db := env.GetenvInt("REDIS_DB", 0)
-	redis_exprie := env.GetenvInt("REDIS_EXPIRE", 60)
+	redis_expire := env.GetenvInt("REDIS_EXPIRE", 60)
 
 	return &RedisConfig{
 		RedisHost:     redis_host,
 		RedisPort:     redis_port,
 		RedisPassword: redis_password,
 		RedisDB:       redis_db,
-		RedisExpire:   redis_exprie,
+		RedisExpire:   redis_expire,
 	}
 }

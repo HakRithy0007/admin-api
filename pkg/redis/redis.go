@@ -21,25 +21,6 @@ type CacheData struct {
 	Username     string `json:"username"`
 }
 
-type Cards struct {
-	ID            int        `json:"id" db:"id"`
-	SuitName      string     `db:"suit_name"`
-	SuitSymbol    string     `db:"suit_symbol"`
-	CardName      string     `json:"card_name" db:"card_name"`
-	CardNumber    int        `json:"card_number" db:"card_number"`
-	IsAllowRandom bool       `json:"is_allow_random" db:"is_allow_random"`
-	CardValue     int        `json:"card_value" db:"card_value"`
-	CardTypeID    int        `json:"card_type_id" db:"card_type_id"`
-	CardImage     *string    `json:"card_image" db:"card_image"`
-	StatusID      int        `json:"status_id" db:"status_id"`
-	Order         int        `json:"order" db:"order"`
-	CreatedBy     int        `json:"-" db:"created_by"`
-	CreatedAt     time.Time  `json:"created_at" db:"created_at"`
-	UpdatedBy     *int       `json:"-" db:"updated_by"`
-	UpdatedAt     time.Time  `json:"-" db:"updated_at"`
-	DeletedBy     *int       `json:"-" db:"deleted_by"`
-	DeletedAt     *time.Time `json:"-" db:"deleted_at"`
-}
 
 func NewRedisUtil(rdb *redis.Client) *RedisUtil {
 	return &RedisUtil{
@@ -161,23 +142,3 @@ func StoreCardData(redisClient *redis.Client, key string, data []byte) error {
     }
     return nil
 }
-
-func GetCardData(redisClient *redis.Client, key string) ([]Cards, error) {
-	ctx := context.Background()
-
-	// Get from Redis
-	cardBytes, err := redisClient.Get(ctx, key).Bytes()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get cards from Redis: %w", err)
-	}
-
-	// Unmarshal JSON
-	var cards []Cards
-	err = json.Unmarshal(cardBytes, &cards)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal cards: %w", err)
-	}
-
-	return cards, nil
-}
-

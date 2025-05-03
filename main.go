@@ -1,31 +1,31 @@
 package main
 
 import (
-	configs "admin-phone-shop-api/config"
+	config "admin-phone-shop-api/config"
 	database "admin-phone-shop-api/config/database"
 	redis "admin-phone-shop-api/config/redis"
-	"admin-phone-shop-api/handler"
 	custom_log "admin-phone-shop-api/pkg/custom_log"
 	translate "admin-phone-shop-api/pkg/utils/translate"
 	routers "admin-phone-shop-api/routers"
+	handler "admin-phone-shop-api/handler"
 	"fmt"
 )
 
 func main() {
 
-	// Initial configurations
-	app_configs := configs.NewConfig()
+	// Configuration
+	app_configs := config.NewConfig()
 
-	// Initial databases
+	// Database
 	db_pool := database.GetDB()
 
-	// Initialize routers
+	// Routers
 	app := routers.New(db_pool)
 
-	// Initialize redis clients
-	rdb := redis.NewRedisClient()
+	// Redis
+	rdb  := redis.NewRedisClient()
 
-	// Initialize the translates
+	// Translate
 	if err := translate.Init(); err != nil {
 		custom_log.NewCustomLog("Failed_initialize_i18n", err.Err.Error(), "error")
 	}

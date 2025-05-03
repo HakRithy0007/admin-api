@@ -28,7 +28,7 @@ func Init() *errors.ErrorResponse {
 	for _, file := range localeFiles {
 		_, err := bundle.LoadMessageFile(filepath.Join(file))
 		if err != nil {
-			log.Printf("Error loading local file %s: %v", file, err)
+			log.Printf("error loading local file %s: %v", file, err)
 			custom_log.NewCustomLog("translate_error", err.Error(), "error")
 			return &errors.ErrorResponse{
 				MessageID: "ErrorLoadMessage",
@@ -44,7 +44,7 @@ func TranslateWithError(c *fiber.Ctx, key string, templateData ...map[string]int
 		custom_log.NewCustomLog("I18nNotInit", Init().ErrorString(), "error")
 		return "", &errors.ErrorResponse{
 			MessageID: key,
-			Err:       fmt.Errorf("Translation service is unavailable for MessageID: %s", key),
+			Err:       fmt.Errorf("translation service is unavailable for MessageID: %s", key),
 		}
 	}
 
@@ -61,11 +61,11 @@ func TranslateWithError(c *fiber.Ctx, key string, templateData ...map[string]int
 		TemplateData: data,
 	})
 	if err != nil {
-		log.Printf("Error localizing message ID %s: %v", key, err)
+		log.Printf("error localizing message ID %s: %v", key, err)
 		custom_log.NewCustomLog("TranslationNotFound", err.Error(), "error")
 		return "", &errors.ErrorResponse{
 			MessageID: key,
-			Err:       fmt.Errorf("Translation not found for MessageID: %s", key),
+			Err:       fmt.Errorf("translation not found for MessageID: %s", key),
 		}
 	}
 	return msg, nil

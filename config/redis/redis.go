@@ -1,7 +1,7 @@
-package redis
+package config
 
 import (
-	config "admin-phone-shop-api/config"
+	redis_config "admin-phone-shop-api/config/redis_config"
 	custom_log "admin-phone-shop-api/pkg/custom_log"
 	"context"
 	"log"
@@ -17,7 +17,7 @@ var (
 
 func NewRedisClient() *redis.Client {
 
-	redis_config := config.InitRedis()
+	redis_config := redis_config.InitRedis()
 
 	once.Do(func() {
 		client = redis.NewClient(&redis.Options{

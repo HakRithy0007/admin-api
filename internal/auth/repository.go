@@ -11,7 +11,7 @@ import (
 	"admin-phone-shop-api/pkg/custom_log"
 	redis_util "admin-phone-shop-api/pkg/redis"
 	audit "admin-phone-shop-api/pkg/utils/audit"
-	"admin-phone-shop-api/pkg/utils/env"
+	env "admin-phone-shop-api/pkg/utils/env"
 	"admin-phone-shop-api/pkg/utils/error"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -152,4 +152,3 @@ func (a *authRepositoryImpl) CheckSession(loginSession string, userID float64) (
 	}
 	return true, nil
 }
-

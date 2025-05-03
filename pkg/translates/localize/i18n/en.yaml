@@ -1,9 +1,0 @@
-# Auth
-login_invalid: "Invalid username or password"
-user_not_found: "User not found"
-session_update_failed: "Session update failed"
-add_audit_log_failed: "Failed to add audit log"
-login_success: "Login successful"
-invalid_request: "Invalid request"
-could_not_query: "could not query"
-show_user_success: "show user success"

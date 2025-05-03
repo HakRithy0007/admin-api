@@ -16,17 +16,14 @@ type Token struct {
 	Id       float64 `json:"id"`
 	Username string  `json:"user_name"`
 }
-
 type PagingOption struct {
 	PerPage int `json:"perpage" query:"per_page" validate:"required"`
 	Page    int `json:"page" query:"page" validate:"required"`
 }
-
 type Filter struct {
 	Property string      `json:"property" query:"property"`
 	Value    interface{} `json:"value" query:"value"`
 }
-
 type Sort struct {
 	Property  string `json:"property" query:"property"`
 	Direction string `json:"direction" query:"direction"`
