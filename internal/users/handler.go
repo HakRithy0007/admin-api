@@ -26,13 +26,10 @@ package users
  			
  			// Fix the type assertion
  			if contextPtr, ok := context.(*model.UserContext); ok {
- 				// Direct pointer cast was successful
  				uCtx = contextPtr
  			} else if contextVal, ok := context.(model.UserContext); ok {
- 				// Value cast was successful, convert to pointer
  				uCtx = &contextVal
  			} else {
- 				// Log the failure and create an empty context
  				custom_log.NewCustomLog("get_user_context_failed", "Failed to cast UserContext from Locals", "warn")
  				uCtx = &model.UserContext{}
  			}
@@ -79,7 +76,7 @@ package users
  					errMsg.ErrorString(),
  					constants.Translate_failed,
  					errMsg.Err,
- 				),
+ 				),``
  			)
  		}
  		return c.Status(fiber.StatusBadRequest).JSON(
