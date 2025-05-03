@@ -22,7 +22,7 @@ import (
 )
 
 type AuthRepository interface {
-	Login(username, password string) (*AuthResponse, *error.ErrorResponse)
+	Login(user_name, password string) (*AuthResponse, *error.ErrorResponse)
 	CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse)
 }
 
@@ -39,21 +39,21 @@ func NewAuthRepository(dbPool *sqlx.DB, redisClient *redis.Client) AuthRepositor
 }
 
 // Login
-func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *error.ErrorResponse) {
+func (a *authRepositoryImpl) Login(user_name, password string) (*AuthResponse, *error.ErrorResponse) {
 	var user UserData
 	msg := error.ErrorResponse{}
 
 	query := `
 		SELECT
 			id, 
-			username,
+			user_name,
 			email,
 			password
 		FROM tbl_users 
-		WHERE username = $1 AND password = $2
+		WHERE user_name = $1 AND password = $2
 	`
 
-	err := a.dbPool.Get(&user, query, username, password)
+	err := a.dbPool.Get(&user, query, user_name, password)
 	if err != nil {
 		custom_log.NewCustomLog("user", err.Error(), "error")
 		return nil, msg.NewErrorResponse("user", fmt.Errorf("user not found. Please check the provided information"))
@@ -72,7 +72,7 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 
 	claims := jwt.MapClaims{
 		"player_id":     user.ID,
-		"username":      user.Username,
+		"user_name":      user.User_name,
 		"login_session": loginSession.String(),
 		"exp":           expirationTime.Unix(),
 	}
@@ -106,8 +106,8 @@ func (a *authRepositoryImpl) Login(username, password string) (*AuthResponse, *e
 	res.Auth.Token = tokenString
 	res.Auth.TokenType = "jwt"
 
-	auditDesc := fmt.Sprintf(`User : %s has been login to the system`, username)
-	_, err = audit.AddMemeberAuditLog(user.ID, "Login", auditDesc, 1, "userAgent", user.Username, "ip", user.ID, a.dbPool)
+	auditDesc := fmt.Sprintf(`User : %s has been login to the system`, user_name)
+	_, err = audit.AddMemeberAuditLog(user.ID, "Login", auditDesc, 1, "userAgent", user.User_name, "ip", user.ID, a.dbPool)
 	if err != nil {
 		custom_log.NewCustomLog("add_audit_log_failed", err.Error(), "error")
 		return nil, msg.NewErrorResponse("add_audit_log_failed", fmt.Errorf("cannot insert data to audit log"))

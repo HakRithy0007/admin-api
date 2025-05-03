@@ -48,7 +48,7 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 		)
 	}
 
-	success, err := a.authService.Login(req.Auth.Username, req.Auth.Password)
+	success, err := a.authService.Login(req.Auth.User_name, req.Auth.Password)
 
 	if err != nil {
 		msg, msgErr := translate.TranslateWithError(c, err.MessageID)

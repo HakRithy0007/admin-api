@@ -18,7 +18,7 @@ type CacheData struct {
 	Exp          int    `json:"exp"`
 	LoginSession string `json:"login_session"`
 	UserID       int    `json:"user_id"`
-	Username     string `json:"username"`
+	User_name     string `json:"user_name"`
 }
 
 

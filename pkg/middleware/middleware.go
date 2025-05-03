@@ -54,7 +54,7 @@ func handleUserContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *r
 
 	uCtx := custom_models.UserContext{
 		PlayerID:     uclaim["player_id"].(float64),
-		UserName:     uclaim["username"].(string),
+		User_Name:     uclaim["user_name"].(string),
 		LoginSession: login_session,
 		Exp:          time.Unix(int64(uclaim["exp"].(float64)), 0),
 		UserAgent:    c.Get("User-Agent", "unknown"),

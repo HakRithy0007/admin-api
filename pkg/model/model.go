@@ -4,7 +4,7 @@ import "time"
 
 type UserContext struct {
 	PlayerID     float64   `json:"player_id"`
-	UserName     string    `json:"user_name"`
+	User_Name     string    `json:"user_name"`
 	LoginSession string    `json:"login_session"`
 	Exp          time.Time `json:"exp"`
 	UserAgent    string    `json:"user_agent"`
@@ -14,7 +14,7 @@ type UserContext struct {
 }
 type Token struct {
 	Id       float64 `json:"id"`
-	Username string  `json:"user_name"`
+	User_name string  `json:"user_name"`
 }
 type PagingOption struct {
 	PerPage int `json:"perpage" query:"per_page" validate:"required"`

@@ -9,7 +9,7 @@ import (
 // AuthLoginRequest represents the login request payload
 type AuthLoginRequest struct {
 	Auth struct {
-		Username string `json:"username" db:"username" validate:"required"`
+		User_name string `json:"user_name" db:"user_name" validate:"required"`
 		Password string `json:"password" db:"password" validate:"required"`
 	} `json:"auth"`
 }
@@ -34,7 +34,7 @@ type AuthResponse struct {
 
 type UserData struct {
 	ID       int    `db:"id" json:"id"`
-	Username string `db:"username" json:"username"`
+	User_name string `db:"user_name" json:"user_name"`
 	Email    string `db:"email" json:"email"`
 	Password string `db:"password" json:"password"`
 }
