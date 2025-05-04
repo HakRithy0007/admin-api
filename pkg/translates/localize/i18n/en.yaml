@@ -1,2 +1,4 @@
 login_invalid: "Login Invalid"
 login_success: "Login Success"
+logout_failed: "Logout Failed"
+logout_success: "Logout Success"

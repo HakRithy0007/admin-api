@@ -83,9 +83,9 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 // Logout
 func (a *AuthHandler) Logout(c *fiber.Ctx) error {
 	v := custom_validator.NewValidator()
-	 logoutReq := &LogoutRequest{}
+	logoutReq := &LogoutRequest{}
 
-	 if err := logoutReq.bind(c, v); err != nil {
+	if err := logoutReq.bind(c, v); err != nil {
 		msg, errMsg := translate.TranslateWithError(c, "logout_invalid")
 		if errMsg != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(
@@ -103,10 +103,10 @@ func (a *AuthHandler) Logout(c *fiber.Ctx) error {
 				err,
 			),
 		)
-	 }
+	}
 
-	 success, err := a.authService.Logout(logoutReq.AdminID, logoutReq.LoginSession)
-	 if err != nil {
+	success, err := a.authService.Logout(logoutReq.AdminID)
+	if err != nil {
 		msg, msgErr := translate.TranslateWithError(c, err.MessageID)
 		if msgErr != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(response.NewResponseError(

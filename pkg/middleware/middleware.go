@@ -53,7 +53,7 @@ func handleAdminContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *
 	}
 
 	uCtx := custom_models.AdminContext{
-		PlayerID:     uclaim["player_id"].(float64),
+		AdminID:     uclaim["admin_id"].(int),
 		Admin_Name:     uclaim["admin_name"].(string),
 		LoginSession: login_session,
 		Exp:          time.Unix(int64(uclaim["exp"].(float64)), 0),
@@ -63,7 +63,7 @@ func handleAdminContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *
 	c.Locals("AdminContext", uCtx)
 
 	sv := auth.NewAuthService(db, redis)
-	success, err := sv.CheckSession(login_session, uCtx.PlayerID)
+	success, err := sv.CheckSession(login_session, uCtx.AdminID)
 	if err != nil || !success {
 		smg_error := response.NewResponseError(
 			custom_translate.Translate(c, "login_session_invalid"),

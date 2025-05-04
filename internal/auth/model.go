@@ -10,11 +10,11 @@ import (
 type AuthLoginRequest struct {
 	Auth struct {
 		Admin_name string `json:"admin_name" db:"admin_name" validate:"required"`
-		Password string `json:"password" db:"password" validate:"required"`
+		Password   string `json:"password" db:"password" validate:"required"`
 	} `json:"auth"`
 }
 
-// Bind request payload 
+// Bind request payload
 func (r *AuthLoginRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.BodyParser(r); err != nil {
 		return err
@@ -33,10 +33,10 @@ type AuthResponse struct {
 }
 
 type AdminData struct {
-	ID       int    `db:"id" json:"id"`
+	ID         int    `db:"id" json:"id"`
 	Admin_name string `db:"admin_name" json:"admin_name"`
-	Email    string `db:"email" json:"email"`
-	Password string `db:"password" json:"password"`
+	Email      string `db:"email" json:"email"`
+	Password   string `db:"password" json:"password"`
 }
 
 type RedisSession struct {
@@ -44,16 +44,12 @@ type RedisSession struct {
 }
 
 type LogoutRequest struct {
-	AdminID float64 `json:"admin_id"`
-	LoginSession string `json:"login_session"`
+	AdminID int `json:"admin_id" validate:"required"`
 }
 
-func (r *LogoutRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
-	if err := c.BodyParser(r); err != nil {
+func (l *LogoutRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
+	if err := c.BodyParser(l); err != nil {
 		return err
 	}
-	if err := v.Validate(r); err != nil {
-		return err
-	}
-	return nil
+	return v.Validate(l)
 }

@@ -3,7 +3,7 @@ package custom_models
 import "time"
 
 type AdminContext struct {
-	PlayerID     float64   `json:"player_id"`
+	AdminID     int   `json:"admin_id"`
 	Admin_Name     string    `json:"admin_name"`
 	LoginSession string    `json:"login_session"`
 	Exp          time.Time `json:"exp"`
