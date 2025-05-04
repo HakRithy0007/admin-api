@@ -33,15 +33,15 @@ func NewJwtMinddleWare(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) {
 		ContextKey: "jwt_data",
 	}))
 
-	// Middleware to add user context
+	// Middleware to add admin context
 	app.Use(func(c *fiber.Ctx) error {
-		user_token := c.Locals("jwt_data").(*jwt.Token)
-		uclaim := user_token.Claims.(jwt.MapClaims)
-		return handleUserContext(c, uclaim, db_pool, redis)
+		admin_token := c.Locals("jwt_data").(*jwt.Token)
+		uclaim := admin_token.Claims.(jwt.MapClaims)
+		return handleAdminContext(c, uclaim, db_pool, redis)
 	})
 }
 
-func handleUserContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *redis.Client) error {
+func handleAdminContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *redis.Client) error {
 	login_session, ok := uclaim["login_session"].(string)
 	if !ok || login_session == "" {
 		smg_error := response.NewResponseError(
@@ -52,15 +52,15 @@ func handleUserContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *r
 		return c.Status(http.StatusUnprocessableEntity).JSON(smg_error)
 	}
 
-	uCtx := custom_models.UserContext{
+	uCtx := custom_models.AdminContext{
 		PlayerID:     uclaim["player_id"].(float64),
-		User_Name:     uclaim["user_name"].(string),
+		Admin_Name:     uclaim["admin_name"].(string),
 		LoginSession: login_session,
 		Exp:          time.Unix(int64(uclaim["exp"].(float64)), 0),
-		UserAgent:    c.Get("User-Agent", "unknown"),
+		AdminAgent:    c.Get("Admin-Agent", "unknown"),
 		Ip:           c.IP(),
 	}
-	c.Locals("PlayerContext", uCtx)
+	c.Locals("AdminContext", uCtx)
 
 	sv := auth.NewAuthService(db, redis)
 	success, err := sv.CheckSession(login_session, uCtx.PlayerID)

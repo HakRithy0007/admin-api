@@ -2,19 +2,19 @@ package custom_models
 
 import "time"
 
-type UserContext struct {
+type AdminContext struct {
 	PlayerID     float64   `json:"player_id"`
-	User_Name     string    `json:"user_name"`
+	Admin_Name     string    `json:"admin_name"`
 	LoginSession string    `json:"login_session"`
 	Exp          time.Time `json:"exp"`
-	UserAgent    string    `json:"user_agent"`
+	AdminAgent    string    `json:"admin_agent"`
 	Ip           string    `json:"ip"`
 	MembershipId float64   `json:"membership_id"`
 	RoleID       int       `json:"role_id"`
 }
 type Token struct {
 	Id       float64 `json:"id"`
-	User_name string  `json:"user_name"`
+	Admin_name string  `json:"admin_name"`
 }
 type PagingOption struct {
 	PerPage int `json:"perpage" query:"per_page" validate:"required"`

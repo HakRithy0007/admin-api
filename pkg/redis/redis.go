@@ -17,8 +17,8 @@ type RedisUtil struct {
 type CacheData struct {
 	Exp          int    `json:"exp"`
 	LoginSession string `json:"login_session"`
-	UserID       int    `json:"user_id"`
-	User_name     string `json:"user_name"`
+	AdminID       int    `json:"admin_id"`
+	Admin_name     string `json:"admin_name"`
 }
 
 

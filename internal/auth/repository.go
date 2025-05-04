@@ -22,8 +22,8 @@ import (
 )
 
 type AuthRepository interface {
-	Login(user_name, password string) (*AuthResponse, *error.ErrorResponse)
-	CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse)
+	Login(admin_name, password string) (*AuthResponse, *error.ErrorResponse)
+	CheckSession(loginSession string, adminID float64) (bool, *error.ErrorResponse)
 }
 
 type authRepositoryImpl struct {
@@ -39,24 +39,24 @@ func NewAuthRepository(dbPool *sqlx.DB, redisClient *redis.Client) AuthRepositor
 }
 
 // Login
-func (a *authRepositoryImpl) Login(user_name, password string) (*AuthResponse, *error.ErrorResponse) {
-	var user UserData
+func (a *authRepositoryImpl) Login(admin_name, password string) (*AuthResponse, *error.ErrorResponse) {
+	var admin AdminData
 	msg := error.ErrorResponse{}
 
 	query := `
 		SELECT
 			id, 
-			user_name,
+			admin_name,
 			email,
 			password
-		FROM tbl_users 
-		WHERE user_name = $1 AND password = $2
+		FROM tbl_admin 
+		WHERE admin_name = $1 AND password = $2
 	`
 
-	err := a.dbPool.Get(&user, query, user_name, password)
+	err := a.dbPool.Get(&admin, query, admin_name, password)
 	if err != nil {
-		custom_log.NewCustomLog("user", err.Error(), "error")
-		return nil, msg.NewErrorResponse("user", fmt.Errorf("user not found. Please check the provided information"))
+		custom_log.NewCustomLog("admin_not_found", err.Error(), "error")
+		return nil, msg.NewErrorResponse("admin_not_found", fmt.Errorf("admin not found. Please check the provided information"))
 	}
 
 	var res AuthResponse
@@ -71,14 +71,14 @@ func (a *authRepositoryImpl) Login(user_name, password string) (*AuthResponse, *
 	}
 
 	claims := jwt.MapClaims{
-		"player_id":     user.ID,
-		"user_name":      user.User_name,
+		"player_id":     admin.ID,
+		"admin_name":      admin.Admin_name,
 		"login_session": loginSession.String(),
 		"exp":           expirationTime.Unix(),
 	}
 
 	// Set Redis Data
-	key := fmt.Sprintf("user: %d", user.ID)
+	key := fmt.Sprintf("admin: %d", admin.ID)
 	redisUtil := redis_util.NewRedisUtil(a.redis)
 	redisUtil.SetCacheKey(key, claims, context.Background())
 
@@ -86,11 +86,11 @@ func (a *authRepositoryImpl) Login(user_name, password string) (*AuthResponse, *
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 
 	updateQuery := `	
-		UPDATE tbl_users
+		UPDATE tbl_admin
 		SET login_session = $1
 		WHERE id = $2
 	`
-	_, err = a.dbPool.Exec(updateQuery, loginSession.String(), user.ID)
+	_, err = a.dbPool.Exec(updateQuery, loginSession.String(), admin.ID)
 	if err != nil {
 		custom_log.NewCustomLog("session_update_failed", err.Error(), "error")
 		return nil, msg.NewErrorResponse("session_update_failed", fmt.Errorf("cannot update session"))
@@ -106,8 +106,8 @@ func (a *authRepositoryImpl) Login(user_name, password string) (*AuthResponse, *
 	res.Auth.Token = tokenString
 	res.Auth.TokenType = "jwt"
 
-	auditDesc := fmt.Sprintf(`User : %s has been login to the system`, user_name)
-	_, err = audit.AddMemeberAuditLog(user.ID, "Login", auditDesc, 1, "userAgent", user.User_name, "ip", user.ID, a.dbPool)
+	auditDesc := fmt.Sprintf(`Admin : %s has been login to the system`, admin_name)
+	_, err = audit.AddMemeberAuditLog(admin.ID, "Login", auditDesc, 1, "adminAgent", admin.Admin_name, "ip", admin.ID, a.dbPool)
 	if err != nil {
 		custom_log.NewCustomLog("add_audit_log_failed", err.Error(), "error")
 		return nil, msg.NewErrorResponse("add_audit_log_failed", fmt.Errorf("cannot insert data to audit log"))
@@ -117,10 +117,10 @@ func (a *authRepositoryImpl) Login(user_name, password string) (*AuthResponse, *
 }
 
 // CheckSession
-func (a *authRepositoryImpl) CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse) {
+func (a *authRepositoryImpl) CheckSession(loginSession string, adminID float64) (bool, *error.ErrorResponse) {
 	msg := error.ErrorResponse{}
 
-	key := fmt.Sprintf("user: %d", int(userID))
+	key := fmt.Sprintf("admin: %d", int(adminID))
 	redisUtil := redis_util.NewRedisUtil(a.redis)
 
 	keyData, err := redisUtil.GetCacheKey(key, context.Background())
@@ -134,7 +134,7 @@ func (a *authRepositoryImpl) CheckSession(loginSession string, userID float64) (
 
 	query := `
 		SELECT login_session
-		FROM tbl_users
+		FROM tbl_admin
 		WHERE login_session = $1
 	`
 	err = a.dbPool.Get(&storedLoginSession, query, loginSession)

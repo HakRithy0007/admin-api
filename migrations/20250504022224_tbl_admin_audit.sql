@@ -1,11 +1,11 @@
 -- +goose Up
-CREATE TABLE tbl_users_audit (
+CREATE TABLE tbl_admin_audit (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    user_audit_context VARCHAR(255) NOT NULL,
-    user_audit_desc VARCHAR(255) NOT NULL,
+    admin_id INTEGER NOT NULL,
+    admin_audit_context VARCHAR(255) NOT NULL,
+    admin_audit_desc VARCHAR(255) NOT NULL,
     audit_type_id INTEGER NOT NULL,
-    user_agent VARCHAR(255) NOT NULL,
+    admin_agent VARCHAR(255) NOT NULL,
     operator VARCHAR(100) NOT NULL,
     ip VARCHAR(50) NOT NULL,
     status_id SMALLINT DEFAULT 1,
@@ -19,4 +19,4 @@ CREATE TABLE tbl_users_audit (
 );
 
 -- +goose Down
-DROP TABLE IF EXISTS tbl_users_audit;
+DROP TABLE IF EXISTS tbl_admin_audit;

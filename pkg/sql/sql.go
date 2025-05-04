@@ -17,16 +17,16 @@ type SeqResult struct {
 }
 
 // SeqResult struct to store sequence result
-func GetUserIdByField(tableName, fieldName string, value interface{}, db *sqlx.DB) (*int, error) {
+func GetAdminIdByField(tableName, fieldName string, value interface{}, db *sqlx.DB) (*int, error) {
 	// Ensure table and field names are sanitized
 	query := fmt.Sprintf(`SELECT id FROM %s WHERE %s = $1 AND deleted_at IS NULL LIMIT 1`, tableName, fieldName)
 
-	var userID *int
-	err := db.Get(&userID, query, value)
+	var adminID *int
+	err := db.Get(&adminID, query, value)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user id: %w", err)
+		return nil, fmt.Errorf("failed to get admin id: %w", err)
 	}
-	return userID, nil
+	return adminID, nil
 }
 
 func IsExits(tbl_name string, field_name string, value interface{}, db *sqlx.DB) (bool, error) {

@@ -9,8 +9,8 @@ import (
 
 // AuthService defines the service layer for authentication
 type AuthService interface {
-	Login(user_name, password string) (*AuthResponse, *error.ErrorResponse)
-	CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse)
+	Login(admin_name, password string) (*AuthResponse, *error.ErrorResponse)
+	CheckSession(loginSession string, adminID float64) (bool, *error.ErrorResponse)
 }
 
 // authServiceImpl implements AuthService
@@ -25,10 +25,10 @@ func NewAuthService(dbPool *sqlx.DB, redisClient *redis.Client) AuthService {
 	}
 }
 
-func (a *authServiceImpl) Login(user_name, password string) (*AuthResponse, *error.ErrorResponse) {
-	return a.repo.Login(user_name, password)
+func (a *authServiceImpl) Login(admin_name, password string) (*AuthResponse, *error.ErrorResponse) {
+	return a.repo.Login(admin_name, password)
 }
 
-func (a *authServiceImpl) CheckSession(loginSession string, userID float64) (bool, *error.ErrorResponse) {
-	return a.repo.CheckSession(loginSession, userID)
+func (a *authServiceImpl) CheckSession(loginSession string, adminID float64) (bool, *error.ErrorResponse) {
+	return a.repo.CheckSession(loginSession, adminID)
 }

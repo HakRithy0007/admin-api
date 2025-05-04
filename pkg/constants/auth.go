@@ -10,8 +10,8 @@ const (
 	Login_success             = 3304
 
 	Invalid_request		= 3305
-	Show_user_audit_Failed = 3306
-	Show_user_success	= 3307
+	Show_admin_audit_Failed = 3306
+	Show_admin_success	= 3307
 
-	Show_user_Failed	= 3308
+	Show_admin_Failed	= 3308
 )

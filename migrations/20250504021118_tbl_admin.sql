@@ -1,9 +1,9 @@
 -- +goose Up
-CREATE TABLE tbl_users (
+CREATE TABLE tbl_admin (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(20) DEFAULT NULL,
     last_name VARCHAR(20) DEFAULT NULL,
-    user_name VARCHAR(50) NOT NULL UNIQUE,
+    admin_name VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(15) DEFAULT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE tbl_users (
 );
 
 -- +goose StatementBegin
-INSERT INTO tbl_users (first_name, last_name, user_name, password, email) VALUES
+INSERT INTO tbl_admin (first_name, last_name, admin_name, password, email) VALUES
     ('Admin', 'One', 'ADMIN1', '123456', 'admin1@example.com'),
     ('Admin', 'Two', 'ADMIN2', '123456', 'admin2@example.com'),
     ('Admin', 'Three', 'ADMIN3', '123456', 'admin3@example.com'),
@@ -36,4 +36,4 @@ INSERT INTO tbl_users (first_name, last_name, user_name, password, email) VALUES
 -- +goose StatementEnd
 
 -- +goose Down
-DROP TABLE IF EXISTS tbl_users;
+DROP TABLE IF EXISTS tbl_admin;

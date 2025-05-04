@@ -11,16 +11,16 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func AddMemeberAuditLog(user_id int, audit_context string, audit_desc string, audit_type_id int, user_agent string, user_name string, ip string, by_id int, db_pool *sqlx.DB) (*bool, error) {
+func AddMemeberAuditLog(admin_id int, audit_context string, audit_desc string, audit_type_id int, admin_agent string, admin_name string, ip string, by_id int, db_pool *sqlx.DB) (*bool, error) {
 
-	orderSeqName := "tbl_users_audit_id_seq"
+	orderSeqName := "tbl_admin_audit_id_seq"
 	orderVal, err := sql.GetSeqNextVal(orderSeqName, db_pool)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch next order value: %w", err)
 	}
 
-	var query = `INSERT INTO tbl_users_audit (
-		id, user_id, user_audit_context, user_audit_desc, audit_type_id, user_agent, operator, ip, status_id, "order", created_by, created_at
+	var query = `INSERT INTO tbl_admin_audit (
+		id, admin_id, admin_audit_context, admin_audit_desc, audit_type_id, admin_agent, operator, ip, status_id, "order", created_by, created_at
 		) VALUES (
 		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 		)`
@@ -33,12 +33,12 @@ func AddMemeberAuditLog(user_id int, audit_context string, audit_desc string, au
 	_, err = db_pool.Exec(
 		query,
 		*orderVal,
-		user_id,
+		admin_id,
 		audit_context,
 		audit_desc,
 		audit_type_id,
-		user_agent,
-		user_name,
+		admin_agent,
+		admin_name,
 		ip,
 		1,
 		*orderVal,
@@ -46,7 +46,7 @@ func AddMemeberAuditLog(user_id int, audit_context string, audit_desc string, au
 		local_now,
 	)
 	if err != nil {
-		custom_log.NewCustomLog("user_create_failed", err.Error(), "error")
+		custom_log.NewCustomLog("admin_create_failed", err.Error(), "error")
 		return nil, err
 	}
 	state := true
