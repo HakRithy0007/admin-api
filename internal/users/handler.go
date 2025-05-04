@@ -76,7 +76,7 @@ package users
  					errMsg.ErrorString(),
  					constants.Translate_failed,
  					errMsg.Err,
- 				),``
+ 				),
  			)
  		}
  		return c.Status(fiber.StatusBadRequest).JSON(
