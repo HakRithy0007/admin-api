@@ -42,3 +42,18 @@ type AdminData struct {
 type RedisSession struct {
 	LoginSession string `json:"login_session"`
 }
+
+type LogoutRequest struct {
+	AdminID float64 `json:"admin_id"`
+	LoginSession string `json:"login_session"`
+}
+
+func (r *LogoutRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+	if err := v.Validate(r); err != nil {
+		return err
+	}
+	return nil
+}

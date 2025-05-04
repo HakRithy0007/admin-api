@@ -19,8 +19,20 @@ func AddMemeberAuditLog(admin_id int, audit_context string, audit_desc string, a
 		return nil, fmt.Errorf("failed to fetch next order value: %w", err)
 	}
 
-	var query = `INSERT INTO tbl_admin_audit (
-		id, admin_id, admin_audit_context, admin_audit_desc, audit_type_id, admin_agent, operator, ip, status_id, "order", created_by, created_at
+	var query = `
+		INSERT INTO tbl_admin_audit (
+			id, 
+			admin_id, 
+			admin_audit_context, 
+			admin_audit_desc, 
+			audit_type_id, 
+			admin_agent, 
+			operator, 
+			ip, 
+			status_id, 
+			"order", 
+			created_by, 
+			created_at
 		) VALUES (
 		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 		)`

@@ -152,3 +152,5 @@ func (a *authRepositoryImpl) CheckSession(loginSession string, adminID float64) 
 	}
 	return true, nil
 }
+
+// Logout

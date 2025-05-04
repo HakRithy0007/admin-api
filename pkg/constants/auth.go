@@ -14,4 +14,7 @@ const (
 	Show_admin_success	= 3307
 
 	Show_admin_Failed	= 3308
+
+	Logout_invalid = 8372
+	Logout_success =7123
 )

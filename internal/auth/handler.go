@@ -12,7 +12,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// AuthHandler handles HTTP requests related to authentication
 type AuthHandler struct {
 	authService AuthService
 }
@@ -77,6 +76,62 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response.NewResponse(
 		msg,
 		constants.Login_success,
+		success,
+	))
+}
+
+// Logout
+func (a *AuthHandler) Logout(c *fiber.Ctx) error {
+	v := custom_validator.NewValidator()
+	 logoutReq := &LogoutRequest{}
+
+	 if err := logoutReq.bind(c, v); err != nil {
+		msg, errMsg := translate.TranslateWithError(c, "logout_invalid")
+		if errMsg != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.NewResponseError(
+					errMsg.ErrorString(),
+					constants.Translate_failed,
+					errMsg.Err,
+				),
+			)
+		}
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(
+			response.NewResponseError(
+				msg,
+				constants.Logout_invalid,
+				err,
+			),
+		)
+	 }
+
+	 success, err := a.authService.Logout(logoutReq.AdminID, logoutReq.LoginSession)
+	 if err != nil {
+		msg, msgErr := translate.TranslateWithError(c, err.MessageID)
+		if msgErr != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(response.NewResponseError(
+				msgErr.Err.Error(),
+				constants.Translate_failed,
+				msgErr.Err,
+			))
+		}
+		return c.Status(fiber.StatusUnauthorized).JSON(response.NewResponseError(
+			msg,
+			constants.LoginFailed,
+			err.Err,
+		))
+	}
+	msg, errMsg := translate.TranslateWithError(c, "logout_success")
+	if errMsg != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.NewResponseError(
+			errMsg.ErrorString(),
+			constants.Translate_failed,
+			errMsg.Err,
+		))
+	}
+	return c.Status(fiber.StatusOK).JSON(response.NewResponse(
+		msg,
+		constants.Logout_success,
 		success,
 	))
 }
