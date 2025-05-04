@@ -27,10 +27,6 @@ func (a *AuthRoute) RegisterAuthRoute() *AuthRoute {
 	return a
 }
 
-// POST /admin/auth/login → Admin login and get a token
-
-// POST /admin/auth/logout → Admin logout
-
 // GET /admin/auth/profile → Get admin profile
 
 // PUT /admin/auth/profile → Update admin profile
