@@ -15,24 +15,20 @@ import (
 )
 
 type CreateUserRequest struct {
-	FirstName   string `json:"first_name" validate:"reqired"`
-	LastName    string `json:"last_name" validate:"reqired"`
-	UserName    string `json:"username" validate:"reqired"`
-	Password    string `json:"password" validate:"reqired, min=6"`
+	FirstName   string `json:"first_name" validate:"required"`
+	LastName    string `json:"last_name" validate:"required"`
+	UserName    string `json:"username" validate:"required"`
+	Password    string `json:"password" validate:"required,min=6"`
 	Email       string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
 	RoleID      int    `json:"role_id"`
 }
 
-func (u CreateUserRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
+func (u *CreateUserRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.BodyParser(u); err != nil {
 		return err
 	}
-
-	if err := v.Validate(u); err != nil {
-		return err
-	}
-	return nil
+	return v.Validate(u)
 }
 
 type User struct {
@@ -64,17 +60,16 @@ type NewUser struct {
 	Username     string    `db:"user_name"`
 	Email        string    `db:"email"`
 	LoginSession *string   `db:"login_session"`
-	Phone        string    `db:"phone"`
+	PhoneNumber  string    `db:"phone"`
 	Password     string    `db:"password"`
 	StatusID     int       `db:"status_id"`
-	OrderBy      int       `db:"order"`
+	Order        int       `db:"order"`
 	CreatedAt    time.Time `db:"created_at"`
 	CreatedBy    int       `db:"created_by"`
 	RoleID       int       `db:"role_id"`
 }
 
 func (u *NewUser) New(createUserReq CreateUserRequest, aCtx *custom_models.AdminContext, db_pool *sqlx.DB) error {
-
 	if aCtx.RoleID > createUserReq.RoleID {
 		return fmt.Errorf("failed you role can not create this user")
 	}
@@ -113,12 +108,13 @@ func (u *NewUser) New(createUserReq CreateUserRequest, aCtx *custom_models.Admin
 
 	u.FirstName = createUserReq.FirstName
 	u.LastName = createUserReq.LastName
+	u.Username = createUserReq.UserName // Fixed: Using UserName from request
 	u.Password = createUserReq.Password
 	u.Email = createUserReq.Email
 	u.LoginSession = &sessionString
 	u.StatusID = 1
-	u.OrderBy = *orderValue
-	u.Phone = createUserReq.PhoneNumber
+	u.Order = *orderValue
+	u.PhoneNumber = createUserReq.PhoneNumber
 	u.CreatedBy = *createdByID
 	u.CreatedAt = local_now
 	u.RoleID = createUserReq.RoleID

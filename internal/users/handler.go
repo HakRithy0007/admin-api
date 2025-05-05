@@ -36,7 +36,6 @@ func NewHandler(db_pool *sqlx.DB) *UserHandler {
 	}
 }
 
-
 // Create User
 func (u *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var createUserReq = CreateUserRequest{}
@@ -84,7 +83,6 @@ func (u *UserHandler) CreateUser(c *fiber.Ctx) error {
 			),
 		)
 	} else {
-
 		msg, err_msg := translate.TranslateWithError(c, "user_create_success")
 		if err_msg != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(response.NewResponse(
@@ -100,5 +98,4 @@ func (u *UserHandler) CreateUser(c *fiber.Ctx) error {
 				user,
 			))
 	}
-
 }

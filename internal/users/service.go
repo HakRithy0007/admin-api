@@ -36,14 +36,13 @@ func (u *UserService) CreateUser(createUserReq CreateUserRequest) (*UserRespones
 	}
 
 	// Add audit
-	auditDesc := fmt.Sprintf(`Admin ID: %d has logged out`, createUserReq.UserName)
-	_, auditErr := audit.AddMemeberAuditLog(success.User.ID, "Logout", auditDesc, 1, "adminAgent", "", "ip", u.userCtx.AdminID, u.db_pool)
+	auditDesc := fmt.Sprintf(`Admin created user: %s`, createUserReq.UserName)                                                             // Fixed incorrect audit description
+	_, auditErr := audit.AddMemeberAuditLog(success.User.ID, "Create", auditDesc, 1, "adminAgent", "", "ip", u.userCtx.AdminID, u.db_pool) // Changed "Logout" to "Create"
 	if auditErr != nil {
 		custom_log.NewCustomLog("add_audit_log_failed", auditErr.Error(), "error")
 		errResponse := &error_response.ErrorResponse{}
-		return nil, errResponse.NewErrorResponse("add_audit_log_failed", fmt.Errorf("cannot insert logout audit log"))
+		return nil, errResponse.NewErrorResponse("add_audit_log_failed", fmt.Errorf("cannot insert user creation audit log"))
 	}
 
 	return success, nil
-
 }
