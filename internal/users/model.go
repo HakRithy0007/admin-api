@@ -1,22 +1,30 @@
 package users
 
 import (
+	custom_log "admin-phone-shop-api/pkg/custom_log"
+	custom_models "admin-phone-shop-api/pkg/model"
+	"admin-phone-shop-api/pkg/sql"
 	custom_validator "admin-phone-shop-api/pkg/validator"
+	"fmt"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
-
 type CreateUserRequest struct {
-	FirstName string `json:"first_name" validate:"reqired"`
-	LastName string `json:"last_name" validate:"reqired"`
-	UserName string `json:"username" validate:"reqired"`
-	Password string `json:"password" validate:"reqired, min=6"`
-	Email string `json:"email"`
+	FirstName   string `json:"first_name" validate:"reqired"`
+	LastName    string `json:"last_name" validate:"reqired"`
+	UserName    string `json:"username" validate:"reqired"`
+	Password    string `json:"password" validate:"reqired, min=6"`
+	Email       string `json:"email"`
 	PhoneNumber string `json:"phone_number"`
+	RoleID      int    `json:"role_id"`
 }
 
-func (u CreateUserRequest) bind (c *fiber.Ctx, v *custom_validator.Validator) error {
+func (u CreateUserRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.BodyParser(u); err != nil {
 		return err
 	}
@@ -47,4 +55,50 @@ type User struct {
 
 type UserResponese struct {
 	User User `json:"user"`
+}
+
+type NewUser struct {
+	ID           int       `db:"id"`
+	FirstName    string    `db:"first_name"`
+	LastName     string    `db:"last_name"`
+	Username     string    `db:"user_name"`
+	Email        string    `db:"email"`
+	LoginSession *string   `db:"login_session"`
+	Phone        string    `db:"phone"`
+	Password     string    `db:"password"`
+	StatusID     int       `db:"status_id"`
+	OrderBy      int       `db:"order"`
+	CreatedAt    time.Time `db:"created_at"`
+	CreatedBy    int       `db:"created_by"`
+	RoleID       int       `db:"role_id"`
+}
+
+func (u *NewUser) New(createUserReq CreateUserRequest, aCtx *custom_models.AdminContext, db_pool *sqlx.DB) error {
+
+	if aCtx.RoleID > createUserReq.RoleID {
+		return fmt.Errorf("failed you role can not create this user")
+	}
+
+	login_session, err := uuid.NewV7()
+	if err != nil {
+		custom_log.NewCustomLog("get_uuid_failed", err.Error(), "error")
+		return err
+	}
+	sessionString := login_session.String()
+
+	app_timezone := os.Getenv("TIME_ZONE")
+	location, err := time.LoadLocation(app_timezone)
+	if err != nil {
+		return fmt.Errorf("failed to load location: %w", err)
+	}
+	local_now := time.Now().In(location)
+
+	is_username, err := sql.IsExits("tbl_user", "user_name", createUserReq.UserName, db_pool)
+	if err != nil {
+		return err
+	} else {
+		if is_username {
+			return fmt.Errorf("%s", fmt.Sprintf("username:`%s` already exists", createUserReq.UserName))
+		}
+	}
 }

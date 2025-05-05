@@ -35,6 +35,11 @@ func (u UserRepoImpl) CreateUser(createUserReq CreateUserRequest) (*UserRespones
 		return nil, msg.NewErrorResponse("transaction_start_failed", fmt.Errorf("transaction start failed"))
 	}
 
+
+	var newUser = NewUser{}
+
+	err = newUser.New
+
 	// Commit transaction
 	err = tx.Commit()
 	if err != nil {
