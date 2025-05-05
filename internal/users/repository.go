@@ -39,7 +39,14 @@ func (u UserRepoImpl) CreateUser(createUserReq CreateUserRequest) (*UserRespones
 
 	var newUser = NewUser{}
 
-	err = newUser.New
+	err = newUser.New(createUserReq, u.userCtx, u.db_pool)
+	if err != nil {
+		tx.Rollback()
+		custom_log.NewCustomLog("create_member_failed", err.Error(), "error")
+		return nil, msg.NewErrorResponse("create_member_failed", err)
+	}
+
+	
 
 	// Commit transaction
 	err = tx.Commit()
