@@ -3,7 +3,7 @@ package users
 import (
 	custom_log "admin-phone-shop-api/pkg/custom_log"
 	custom_models "admin-phone-shop-api/pkg/model"
-	"admin-phone-shop-api/pkg/sql"
+	sql "admin-phone-shop-api/pkg/sql"
 	custom_validator "admin-phone-shop-api/pkg/validator"
 	"fmt"
 	"os"
@@ -101,4 +101,27 @@ func (u *NewUser) New(createUserReq CreateUserRequest, aCtx *custom_models.Admin
 			return fmt.Errorf("%s", fmt.Sprintf("username:`%s` already exists", createUserReq.UserName))
 		}
 	}
+	createdByID, err := sql.GetAdminIdByField("tbl_users", "user_name", aCtx.Admin_Name, db_pool)
+	if err != nil {
+		return err
+	}
+
+	orderValue, err := sql.GetSeqNextVal("tbl_users_id_seq", db_pool)
+	if err != nil {
+		return fmt.Errorf("failed to generate order value: %w", err)
+	}
+
+	u.FirstName = createUserReq.FirstName
+	u.LastName = createUserReq.LastName
+	u.Password = createUserReq.Password
+	u.Email = createUserReq.Email
+	u.LoginSession = &sessionString
+	u.StatusID = 1
+	u.OrderBy = *orderValue
+	u.Phone = createUserReq.PhoneNumber
+	u.CreatedBy = *createdByID
+	u.CreatedAt = local_now
+	u.RoleID = createUserReq.RoleID
+
+	return nil
 }
