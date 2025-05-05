@@ -26,7 +26,7 @@ func New(db_pool *sqlx.DB) *fiber.App {
 				language.MustParse("km"),
 				language.English,
 			},
-			DefaultLanguage: language.Khmer,
+			DefaultLanguage: language.English,
 		}),
 	)
 	return f

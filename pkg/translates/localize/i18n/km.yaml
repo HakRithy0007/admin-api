@@ -1,2 +1,3 @@
-login_invalid: "Login Invalid"
-login_success: "Login Success"
+login_invalid: "ការចូល​ បរាជ័យ"
+login_success: "ការចូល ជោគជ័យ"
+login_session_invalid: "បាត់ សេសសិន"

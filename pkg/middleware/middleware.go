@@ -68,9 +68,9 @@ func handleAdminContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *
 	success, err := sv.CheckSession(login_session, uCtx.AdminID)
 	if err != nil || !success {
 		smg_error := response.NewResponseError(
-			translate.Translate("loginSessionInvalid", nil, c),
+			translate.Translate("login_session_invalid", nil, c),
 			-500,
-			fmt.Errorf("%s", translate.Translate("loginSessionInvalid", nil, c)),
+			fmt.Errorf("%s", translate.Translate("login_session_invalid", nil, c)),
 		)
 		return c.Status(http.StatusUnprocessableEntity).JSON(smg_error)
 	}
