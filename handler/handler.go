@@ -6,6 +6,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	auth "admin-phone-shop-api/internal/auth"
+	user "admin-phone-shop-api/internal/users"
 	middleware "admin-phone-shop-api/pkg/middleware"
 )
 
@@ -15,6 +16,7 @@ type ServiceHandlers struct {
 
 type FrontService struct {
 	AuthHandler *auth.AuthRoute
+	UserHandler *user.UserRoute
 }
 
 func NewFrontService(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) *FrontService {
@@ -25,8 +27,12 @@ func NewFrontService(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) *Fro
 	// Middleware
 	middleware.NewJwtMinddleWare(app, db_pool, redis)
 
+	// User
+	user := user.NewUserRoute(app, db_pool).RegisterUserRoute()
+
 	return &FrontService{
 		AuthHandler: auth,
+		UserHandler: user,
 	}
 }
 

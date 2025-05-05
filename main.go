@@ -4,10 +4,10 @@ import (
 	config "admin-phone-shop-api/config"
 	database "admin-phone-shop-api/config/database"
 	redis "admin-phone-shop-api/config/redis"
+	handler "admin-phone-shop-api/handler"
 	custom_log "admin-phone-shop-api/pkg/custom_log"
 	translate "admin-phone-shop-api/pkg/utils/translate"
 	routers "admin-phone-shop-api/routers"
-	handler "admin-phone-shop-api/handler"
 	"fmt"
 )
 
@@ -23,7 +23,7 @@ func main() {
 	app := routers.New(db_pool)
 
 	// Redis
-	rdb  := redis.NewRedisClient()
+	rdb := redis.NewRedisClient()
 
 	// Translate
 	if err := translate.Init(); err != nil {

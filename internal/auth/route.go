@@ -26,7 +26,3 @@ func (a *AuthRoute) RegisterAuthRoute() *AuthRoute {
 	auth.Post("/logout", a.handler.Logout)
 	return a
 }
-
-// GET /admin/auth/profile → Get admin profile
-
-// PUT /admin/auth/profile → Update admin profile
