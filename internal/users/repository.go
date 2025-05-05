@@ -68,16 +68,16 @@ func (u *UserRepoImpl) CreateUser(createUserReq CreateUserRequest) (*UserRespone
 	err = tx.QueryRowx(query,
 		newUser.FirstName,
 		newUser.LastName,
-		newUser.Username,    // Added missing username field
+		newUser.Username,
 		newUser.Password,
 		newUser.Email,
 		newUser.LoginSession,
 		newUser.StatusID,
 		newUser.Order,
-		newUser.PhoneNumber, // Fixed field name to match database column 'phone'
+		newUser.PhoneNumber,
 		newUser.CreatedBy,
 		newUser.CreatedAt,
-		newUser.RoleID,      // Added missing role_id parameter
+		newUser.RoleID,   
 	).Scan(&userID)
 
 	if err != nil {
