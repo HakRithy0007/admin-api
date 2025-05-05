@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -28,57 +27,22 @@ func NewJwtMinddleWare(app *fiber.App, db_pool *sqlx.DB, redis *redis.Client) {
 	}
 	secret_key := os.Getenv("JWT_SECRET_KEY")
 
-	app.Use(func(c *fiber.Ctx) error {
-		if websocketUpgrade := c.Get("Upgrade"); websocketUpgrade == "websocket" {
-			webSocketProtocol := c.Get("Sec-webSocket-Protocol")
-			if webSocketProtocol == "" {
-				return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-					"error": "Missing WebSocket protocol for authentication",
-				})
-			}
+	// JWT middleware for standard HTTP requests
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: jwtware.SigningKey{Key: []byte(secret_key)},
+		ContextKey: "jwt_data",
+	}))
 
-			parts := strings.Split(webSocketProtocol, ",")
-			if len(parts) != 2 || strings.TrimSpace(parts[0]) != "Bearer" {
-				return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-					"error": "Invalid webSocket protocal authenticaion format",
-				})
-			}
-
-			tokenString := strings.TrimSpace(parts[1])
-
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-				return []byte(secret_key), nil
-			})
-			if err != nil || !token.Valid {
-				return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-					"error": "Invalid or expired JWT token",
-				})
-			}
-
-			c.Locals("jwt_data", token)
-			c.Set("Sec-WebSocket-Protocol", "Bearer")
-			return c.Next()
-		}
-
-		return jwtware.New(jwtware.Config{
-			SigningKey: jwtware.SigningKey{Key: []byte(secret_key)},
-			ContextKey: "jwt_data",
-		})(c)
-	})
-
+	// Extract and validate user claims
 	app.Use(func(c *fiber.Ctx) error {
 		admin_token := c.Locals("jwt_data").(*jwt.Token)
 		uclaim := admin_token.Claims.(jwt.MapClaims)
 
-		if websocketUpgrade := c.Get("Upgrade"); websocketUpgrade == "websocket" {
-			return handleAdminContext(c, uclaim, db_pool, redis)
-		}
 		return handleAdminContext(c, uclaim, db_pool, redis)
 	})
 }
 
 func handleAdminContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *redis.Client) error {
-
 	login_session, ok := uclaim["login_session"].(string)
 	if !ok || login_session == "" {
 		smg_error := response.NewResponseError(
@@ -93,7 +57,7 @@ func handleAdminContext(c *fiber.Ctx, uclaim jwt.MapClaims, db *sqlx.DB, redis *
 		AdminID:      uclaim["admin_id"].(float64),
 		Admin_Name:   uclaim["admin_name"].(string),
 		RoleID:       int(uclaim["role_id"].(float64)),
-		LoginSession: uclaim["login_session"].(string),
+		LoginSession: login_session,
 		Exp:          time.Unix(int64(uclaim["exp"].(float64)), 0),
 		AdminAgent:   c.Get("Admin-Agent", "unknown"),
 		Ip:           c.IP(),

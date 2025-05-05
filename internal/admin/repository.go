@@ -63,6 +63,6 @@ func (u *AdminRepoImpl) ShowOne(id int) (*AdminResponse, *error_response.ErrorRe
 		return nil, msg.NewErrorResponse("server_error", fmt.Errorf("data error: %v", err))
 	}
 	return &AdminResponse{
-		Admin: admin,
+		AdminInfo: admin,
 	}, nil
 }

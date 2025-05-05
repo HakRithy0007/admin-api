@@ -3,7 +3,7 @@ package admin
 import "time"
 
 type AdminResponse struct {
-	Admin AdminOne `json:"admin"`
+	AdminInfo AdminOne `json:"admin-info"`
 }
 
 type AdminOne struct {
