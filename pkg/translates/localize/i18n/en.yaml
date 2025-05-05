@@ -2,3 +2,13 @@ login_invalid: "Login Invalid"
 login_success: "Login Success"
 logout_failed: "Logout Failed"
 logout_success: "Logout Success"
+
+create_user_failed: "Create User Failed"
+insert_user_failed: "Insert User Failed"
+user_create_success: "User Create Success"
+
+invalid_request: "Invalid Request"
+server_error : "Server Error"
+show_admin_success: "Show Admin Success"
+admin_not_found: "Admin Not Found"
+login_session_invalid: "Login Session Invalid"

@@ -33,10 +33,11 @@ type AuthResponse struct {
 }
 
 type AdminData struct {
-	ID         int    `db:"id" json:"id"`
-	Admin_name string `db:"admin_name" json:"admin_name"`
-	Email      string `db:"email" json:"email"`
-	Password   string `db:"password" json:"password"`
+	ID       int    `db:"id"`
+	AdminName string `db:"admin_name"`
+	Email    string `db:"email"`
+	Password string `db:"password"`
+	RoleID 	int `db:"role_id"`
 }
 
 type RedisSession struct {
@@ -44,7 +45,7 @@ type RedisSession struct {
 }
 
 type LogoutRequest struct {
-	AdminID int `json:"admin_id" validate:"required"`
+	AdminID float64 `json:"admin_id" validate:"required"`
 }
 
 func (l *LogoutRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {

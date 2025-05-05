@@ -22,8 +22,8 @@ import (
 
 type AuthRepository interface {
 	Login(admin_name, password string) (*AdminData, string, *error_response.ErrorResponse)
-	CheckSession(loginSession string, adminID int) (bool, *error_response.ErrorResponse)
-	Logout(adminID int) (bool, *error_response.ErrorResponse)
+	CheckSession(loginSession string, adminID float64) (bool, *error_response.ErrorResponse)
+	Logout(adminID float64) (bool, *error_response.ErrorResponse)
 }
 
 type authRepositoryImpl struct {
@@ -70,13 +70,15 @@ func (a *authRepositoryImpl) Login(admin_name, password string) (*AdminData, str
 
 	claims := jwt.MapClaims{
 		"admin_id":     admin.ID,
-		"admin_name":    admin.Admin_name,
+		"admin_name":    admin.AdminName,
 		"login_session": loginSession.String(),
 		"exp":           expirationTime.Unix(),
+		"role_id":       admin.RoleID,
+		
 	}
 
 	// Set Redis Data
-	key := fmt.Sprintf("admin: %d", admin.ID)
+	key := fmt.Sprintf("admin: %v", admin.ID)
 	redisUtil := redis_util.NewRedisUtil(a.redis)
 	redisUtil.SetCacheKey(key, claims, context.Background())
 
@@ -105,7 +107,7 @@ func (a *authRepositoryImpl) Login(admin_name, password string) (*AdminData, str
 }
 
 // CheckSession
-func (a *authRepositoryImpl) CheckSession(loginSession string, adminID int) (bool, *error_response.ErrorResponse) {
+func (a *authRepositoryImpl) CheckSession(loginSession string, adminID float64) (bool, *error_response.ErrorResponse) {
 	msg := error_response.ErrorResponse{}
 
 	key := fmt.Sprintf("admin: %d", int(adminID))
@@ -142,7 +144,7 @@ func (a *authRepositoryImpl) CheckSession(loginSession string, adminID int) (boo
 }
 
 // Logout
-func (a *authRepositoryImpl) Logout(adminID int) (bool, *error_response.ErrorResponse) {
+func (a *authRepositoryImpl) Logout(adminID float64) (bool, *error_response.ErrorResponse) {
 	msg := error_response.ErrorResponse{}
 
 	// Delete session from redis

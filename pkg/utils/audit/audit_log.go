@@ -11,7 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func AddMemeberAuditLog(admin_id int, audit_context string, audit_desc string, audit_type_id int, admin_agent string, admin_name string, ip string, by_id int, db_pool *sqlx.DB) (*bool, error) {
+func AddMemeberAuditLog(admin_id float64, audit_context string, audit_desc string, audit_type_id int, admin_agent string, admin_name string, ip string, by_id float64, db_pool *sqlx.DB) (*bool, error) {
 
 	orderSeqName := "tbl_admin_audit_id_seq"
 	orderVal, err := sql.GetSeqNextVal(orderSeqName, db_pool)

@@ -71,8 +71,21 @@ func TranslateWithError(c *fiber.Ctx, key string, templateData ...map[string]int
 	return msg, nil
 }
 
-func Translate(c *fiber.Ctx, key string) string {
-	return fiberi18n.MustLocalize(c, &i18n.LocalizeConfig{
-		MessageID: key,
-	})
+
+func Translate(MessageID string, param *string, c *fiber.Ctx) string {
+	var translate string
+	if param != nil {
+		translate = fiberi18n.MustLocalize(c, &i18n.LocalizeConfig{
+			MessageID: MessageID,
+			TemplateData: map[string]interface{}{
+				"name": param,
+			},
+		})
+	} else {
+		translate = fiberi18n.MustLocalize(c, &i18n.LocalizeConfig{
+			MessageID: MessageID,
+		})
+	}
+	return translate
+
 }

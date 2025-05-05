@@ -23,16 +23,10 @@ CREATE TABLE tbl_admin (
 );
 
 -- +goose StatementBegin
-INSERT INTO tbl_admin (first_name, last_name, admin_name, password, email) VALUES
-    ('Admin', 'One', 'ADMIN1', '123456', 'admin1@example.com'),
-    ('Admin', 'Two', 'ADMIN2', '123456', 'admin2@example.com'),
-    ('Admin', 'Three', 'ADMIN3', '123456', 'admin3@example.com'),
-    ('Admin', 'Four', 'ADMIN4', '123456', 'admin4@example.com'),
-    ('Admin', 'Five', 'ADMIN5', '123456', 'admin5@example.com'),
-    ('Admin', 'Six', 'ADMIN6', '123456', 'admin6@example.com'),
-    ('Admin', 'Seven', 'ADMIN7', '123456', 'admin7@example.com'),
-    ('Admin', 'Eight', 'ADMIN8', '123456', 'admin8@example.com'),
-    ('Admin', 'Nine', 'ADMIN9', '123456', 'admin9@example.com');
+INSERT INTO tbl_admin (first_name, last_name, admin_name, password, email, phone, is_admin, role_id, profile_photo, status_id, created_by) VALUES
+('ADMIN', 'SUPER1', 'ADMIN1', '123456', 'ADMIN1@example.com', '1234567890', 1, 1, 'admin1.jpg', 1, 1),
+('ADMIN', 'SUPER2', 'ADMIN2', '123456', 'ADMIN2@example.com', '1234567890', 1, 1, 'admin2.jpg', 1, 1),
+('ADMIN', 'SUPER14', 'ADMIN3', '123456', 'ADMIN3@example.com', '0987654321', 1, 1, 'admin3.jpg', 1, 1);
 -- +goose StatementEnd
 
 -- +goose Down

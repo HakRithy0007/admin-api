@@ -12,8 +12,8 @@ import (
 // AuthService defines the service layer for authentication
 type AuthService interface {
 	Login(admin_name, password string) (*AuthResponse, *error_response.ErrorResponse)
-	CheckSession(loginSession string, adminID int) (bool, *error_response.ErrorResponse)
-	Logout(adminID int) (bool, *error_response.ErrorResponse)
+	CheckSession(loginSession string, adminID float64) (bool, *error_response.ErrorResponse)
+	Logout(adminID float64) (bool, *error_response.ErrorResponse)
 }
 
 
@@ -45,7 +45,7 @@ func (a *authServiceImpl) Login(admin_name, password string) (*AuthResponse, *er
 
 	// Add audit log
 	auditDesc := fmt.Sprintf(`Admin : %s has been login to the system`, admin_name)
-	_, auditErr := audit.AddMemeberAuditLog(int(admin.ID), "Login", auditDesc, 1, "adminAgent", admin.Admin_name, "ip", int(admin.ID), a.dbPool)
+	_, auditErr := audit.AddMemeberAuditLog(float64(admin.ID), "Login", auditDesc, 1, "adminAgent", admin.AdminName, "ip", float64(admin.ID), a.dbPool)
 	if auditErr != nil {
 		custom_log.NewCustomLog("add_audit_log_failed", auditErr.Error(), "error")
 		errResponse := &error_response.ErrorResponse{}
@@ -56,19 +56,19 @@ func (a *authServiceImpl) Login(admin_name, password string) (*AuthResponse, *er
 }
 
 // Check session
-func (a *authServiceImpl) CheckSession(loginSession string, adminID int) (bool, *error_response.ErrorResponse) {
+func (a *authServiceImpl) CheckSession(loginSession string, adminID float64) (bool, *error_response.ErrorResponse) {
 	return a.repo.CheckSession(loginSession, adminID)
 }
 
 // Logout
-func (a *authServiceImpl) Logout(adminID int) (bool, *error_response.ErrorResponse) {
+func (a *authServiceImpl) Logout(adminID float64) (bool, *error_response.ErrorResponse) {
 	success, err := a.repo.Logout(adminID)
 	if err != nil {
 		return false, err
 	}
 
 	// Add audit 
-	auditDesc := fmt.Sprintf(`Admin ID: %d has logged out`, adminID)
+	auditDesc := fmt.Sprintf(`Admin ID: %f has logged out`, adminID)
 	_, auditErr := audit.AddMemeberAuditLog(adminID, "Logout", auditDesc, 1, "adminAgent", "", "ip", adminID, a.dbPool)
 	if auditErr != nil {
 		custom_log.NewCustomLog("add_audit_log_failed", auditErr.Error(), "error")

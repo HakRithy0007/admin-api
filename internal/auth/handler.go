@@ -3,8 +3,8 @@ package auth
 
 import (
 	constants "admin-phone-shop-api/pkg/constants"
-	"admin-phone-shop-api/pkg/utils/response"
-	"admin-phone-shop-api/pkg/utils/translate"
+	response "admin-phone-shop-api/pkg/utils/response"
+	translate "admin-phone-shop-api/pkg/utils/translate"
 	custom_validator "admin-phone-shop-api/pkg/validator"
 
 	"github.com/gofiber/fiber/v2"
