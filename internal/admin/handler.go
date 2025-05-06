@@ -6,6 +6,7 @@ import (
 	custom_models "admin-phone-shop-api/pkg/model"
 	response "admin-phone-shop-api/pkg/utils/response"
 	translate "admin-phone-shop-api/pkg/utils/translate"
+	custom_validator "admin-phone-shop-api/pkg/validator"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,6 +36,33 @@ func NewHandler(db_pool *sqlx.DB) *AdminHandler {
 		},
 	}
 }
+
+// Show all
+func (u *AdminHandler) ShowAll(c *fiber.Ctx) error {
+	var AdminReq AdminShowRequest
+
+	v := custom_validator.NewValidator()
+	if err := AdminReq.bind(c, v); err != nil {
+		msg, err_msg := translate.TranslateWithError(c, "invalid_request")
+		if err_msg != nil{
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.NewResponseError(
+					err_msg.ErrorString(),
+					constants.Translate_failed,
+					err_msg.Err,
+				),
+			)
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.NewResponseError(
+				msg,
+				constants.Invalid_request,
+				err,
+			),
+		)
+	}
+}
+
 
 // ShowOne
 func (u *AdminHandler) ShowOne(c *fiber.Ctx) error {

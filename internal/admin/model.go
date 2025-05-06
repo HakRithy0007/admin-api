@@ -1,6 +1,14 @@
 package admin
 
-import "time"
+import (
+	model "admin-phone-shop-api/pkg/model"
+	custom_validator "admin-phone-shop-api/pkg/validator"
+	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 type AdminResponse struct {
 	AdminInfo AdminOne `json:"admin-info"`
@@ -10,7 +18,7 @@ type AdminOne struct {
 	ID          int        `json:"-" db:"id"`
 	FirstName   string     `json:"first_name" db:"first_name"`
 	LastName    string     `json:"last_name" db:"last_name"`
-	AdminName    string     `json:"admin_name" db:"admin_name"`
+	AdminName   string     `json:"admin_name" db:"admin_name"`
 	Email       string     `json:"email" db:"email"`
 	PhoneNumber string     `json:"phone" db:"phone"`
 	StatusID    int        `json:"status_id" db:"status_id"`
@@ -20,4 +28,31 @@ type AdminOne struct {
 	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
 	DeletedAt   *time.Time `json:"-" db:"deleted_at"`
 	DeletedBy   *int       `json:"-" db:"deleted_by"`
+}
+
+type AdminShowRequest struct {
+	PageOption model.PagingOption `json:"paging_options" query:"paging_options" validate:"required"`
+	Sort       []model.Sort       `json:"sorts,omitempty" query:"sorts"`
+	Filters    []model.Filter     `json:"filters,omitempty" query:"filters"`
+}
+
+func (u *AdminShowRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
+	if err := c.QueryParser(u); err != nil {
+		return err
+	}
+
+	for i := range u.Filters {
+		value := c.Query(fmt.Sprintf("filters[%d][value]", i))
+		if intValue, err := strconv.Atoi(value); err == nil {
+			u.Filters[i].Value = intValue
+		} else if boolValue, err := strconv.ParseBool(value); err == nil {
+			u.Filters[i].Value = boolValue
+		} else {
+			u.Filters[i].Value = value
+		}
+	}
+	if err := v.Validate(u); err != nil {
+		return err
+	}
+	return nil
 }

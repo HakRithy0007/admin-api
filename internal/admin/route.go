@@ -24,6 +24,7 @@ func (u *AdminRoute) RegisterAdminRoute() *AdminRoute {
 	v1 := u.app.Group("/api/v1")
 	admin := v1.Group("/admin")
 
+	admin.Get("/", u.handler.ShowAll)
 	admin.Get("/:id", u.handler.ShowOne)
 
 	// POST	/admin/logout	(Optional) Logout admin
