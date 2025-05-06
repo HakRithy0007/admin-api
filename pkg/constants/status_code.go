@@ -23,4 +23,6 @@ const (
 	Get_current_admin_failed = 3834
 	Get_current_admin_success = 2622
 
+	Show_user_success = 8276
+
 )

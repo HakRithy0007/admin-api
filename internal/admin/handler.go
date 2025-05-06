@@ -61,6 +61,47 @@ func (u *AdminHandler) ShowAll(c *fiber.Ctx) error {
 			),
 		)
 	}
+
+	// Service
+	service := u.adminService(c)
+	success, err := service.ShowAll(AdminReq)
+	if err != nil {
+		msg, err_msg := translate.TranslateWithError(c, err.MessageID)
+		if err_msg != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.NewResponseError(
+					err_msg.ErrorString(),
+					constants.Translate_failed,
+					err_msg.Err,
+				),
+			)
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.NewResponseError(
+				msg,
+				constants.Show_admin_Failed,
+				err.Err,
+			),
+		)
+	} else {
+		msg, err_msg := translate.TranslateWithError(c, "show_user_success")
+		if err_msg != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(response.NewResponse(
+				err_msg.ErrorString(),
+				constants.Translate_failed,
+				err_msg.Err,
+			))
+		}
+		return c.Status(fiber.StatusOK).JSON(
+			response.NewResponseWithPaing(
+				msg,
+				constants.Show_user_success,
+				success,
+				AdminReq.PageOption.Page,
+				AdminReq.PageOption.PerPage,
+				success.Total,
+			))
+	}
 }
 
 

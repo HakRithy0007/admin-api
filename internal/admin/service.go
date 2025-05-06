@@ -26,6 +26,11 @@ func NewAdminService(aCtx *custom_models.AdminContext, db_pool *sqlx.DB) *AdminS
 	}
 }
 
+// Show All
+func (u *AdminService) ShowAll() (*AdminShowResponse, *error_response.ErrorResponse) {
+	return u.adminRepo.ShowAll()
+}
+
 // Show One
 func (u *AdminService) ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse) {
 	success, err := u.adminRepo.ShowOne(id)
