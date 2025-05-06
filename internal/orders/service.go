@@ -23,6 +23,3 @@ func NewUserService(uCtx *custom_models.AdminContext, db_pool *sqlx.DB) *UserSer
 		userRepo: repo,
 	}
 }
-
-
-// Products: GET /admin/products, POST /admin/products, PUT /admin/products/{id}, DELETE /admin/products/{id}
