@@ -71,11 +71,15 @@ type Admin struct {
 	CreatedBy    int     `db:"created_by" json:"created_by"`
 	DeletedAt    *string `db:"deleted_at" json:"-"`
 	RoleID       int     `db:"role_id" json:"role_id"`
-	UserRoleName string  `db:"user_role_name" json:"user_role_name"`
+	AdminRoleName string  `db:"admin_role_name" json:"admin_role_name"`
 	Operator     string  `json:"operator" db:"operator"`
 }
 
 type AdminShowResponse struct {
 	Admin []Admin `json:"admins"`
 	Total int `json:"-"`
+}
+
+type TotalRecord struct {
+	Total int `db:"total"`
 }

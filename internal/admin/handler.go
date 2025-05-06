@@ -84,7 +84,7 @@ func (u *AdminHandler) ShowAll(c *fiber.Ctx) error {
 			),
 		)
 	} else {
-		msg, err_msg := translate.TranslateWithError(c, "show_user_success")
+		msg, err_msg := translate.TranslateWithError(c, "show_admn_success")
 		if err_msg != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(response.NewResponse(
 				err_msg.ErrorString(),
@@ -95,7 +95,7 @@ func (u *AdminHandler) ShowAll(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(
 			response.NewResponseWithPaing(
 				msg,
-				constants.Show_user_success,
+				constants.Show_admin_success,
 				success,
 				AdminReq.PageOption.Page,
 				AdminReq.PageOption.PerPage,
@@ -103,7 +103,6 @@ func (u *AdminHandler) ShowAll(c *fiber.Ctx) error {
 			))
 	}
 }
-
 
 // ShowOne
 func (u *AdminHandler) ShowOne(c *fiber.Ctx) error {

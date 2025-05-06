@@ -31,22 +31,85 @@ func NewAdminRepoImpl(aCtx *custom_models.AdminContext, db_pool *sqlx.DB) AdminR
 // Show All
 func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse) {
 
+	err_msg := &error_response.ErrorResponse{}
+
 	var per_page = adminRequest.PageOption.PerPage
 	var page = adminRequest.PageOption.Page
 	var offset = (page - 1) * per_page
 	var limit_clause = fmt.Sprintf("LIMIT %d OFFSET %d", per_page, offset)
 	var sql_orderby = custom_sql.BuildSQLSort(adminRequest.Sort)
 
+	// Fix filters to use admin_role_name instead of user_role_name
+	for i, filter := range adminRequest.Filters {
+		if filter.Property == "r.user_role_name" {
+			adminRequest.Filters[i].Property = "r.admin_role_name"
+		}
+	}
+
 	sql_filters, args_filters := custom_sql.BuildSQLFilter(adminRequest.Filters)
 	if len(args_filters) > 0 {
-		sql_filters = "AND" + sql_filters
+		sql_filters = "AND " + sql_filters
 	}
 
 	query := fmt.Sprintf(
 		`
-		
-		`
-	)
+		SELECT
+			a.id,
+			a.first_name,
+			a.last_name,
+			a.admin_name AS user_name,
+			a.email,
+			a.phone,
+			a.status_id,
+			a.created_at,
+			a.deleted_at,
+			a.created_by,
+			a.role_id,
+			r.admin_role_name,
+			creator.admin_name AS operator
+		FROM
+			tbl_admin a
+		INNER JOIN
+			tbl_admin_roles r ON a.role_id = r.id
+		INNER JOIN
+			tbl_admin creator ON a.created_by = creator.id
+		WHERE
+			a.deleted_at IS NULL
+			AND r.deleted_at is NULL %s %s %s
+		`, sql_filters, sql_orderby, limit_clause)
+
+		var NewAdmin []Admin
+
+		err := u.db_pool.Select(&NewAdmin, query, args_filters...)
+		if err != nil {
+			custom_log.NewCustomLog("could_not_query", err.Error(), "error")
+			return nil, err_msg.NewErrorResponse("could_not_query", fmt.Errorf("can not select admin data the database is error"))
+		}
+
+		totalQuery := fmt.Sprintf(`
+			SELECT
+				COUNT(*) as total
+				FROM 
+					tbl_admin a
+				INNER JOIN
+					tbl_admin_roles r ON a.role_id = r.id
+				INNER JOIN
+					tbl_admin creator ON a.created_by = creator.id
+				WHERE a.deleted_at IS NULL %s
+		`, sql_filters)
+
+		var total TotalRecord
+
+		err = u.db_pool.Get(&total, totalQuery, args_filters...)
+		if err != nil {
+			custom_log.NewCustomLog("admin_show_failed", err.Error(), "error")
+			return nil, err_msg.NewErrorResponse("admin_show_failed", fmt.Errorf("can not select admin total the database error"))
+		}
+
+		return &AdminShowResponse{
+			Admin: NewAdmin,
+			Total: total.Total,
+		}, nil
 }
 
 // Show One
