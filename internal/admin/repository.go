@@ -4,6 +4,7 @@ import (
 	"admin-phone-shop-api/pkg/custom_log"
 	custom_models "admin-phone-shop-api/pkg/model"
 	error_response "admin-phone-shop-api/pkg/utils/error"
+	custom_sql "admin-phone-shop-api/pkg/sql"
 	"database/sql"
 	"fmt"
 
@@ -30,6 +31,22 @@ func NewAdminRepoImpl(aCtx *custom_models.AdminContext, db_pool *sqlx.DB) AdminR
 // Show All
 func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse) {
 
+	var per_page = adminRequest.PageOption.PerPage
+	var page = adminRequest.PageOption.Page
+	var offset = (page - 1) * per_page
+	var limit_clause = fmt.Sprintf("LIMIT %d OFFSET %d", per_page, offset)
+	var sql_orderby = custom_sql.BuildSQLSort(adminRequest.Sort)
+
+	sql_filters, args_filters := custom_sql.BuildSQLFilter(adminRequest.Filters)
+	if len(args_filters) > 0 {
+		sql_filters = "AND" + sql_filters
+	}
+
+	query := fmt.Sprintf(
+		`
+		
+		`
+	)
 }
 
 // Show One
