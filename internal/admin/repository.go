@@ -11,6 +11,7 @@ import (
 )
 
 type AdminRepo interface {
+	ShowAll(adminRequest AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse)
 	ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse)
 }
 
@@ -24,6 +25,11 @@ func NewAdminRepoImpl(aCtx *custom_models.AdminContext, db_pool *sqlx.DB) AdminR
 		adminCtx: aCtx,
 		db_pool:  db_pool,
 	}
+}
+
+// Show All
+func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse) {
+
 }
 
 // Show One

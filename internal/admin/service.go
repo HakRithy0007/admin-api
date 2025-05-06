@@ -8,6 +8,7 @@ import (
 )
 
 type AdminCreator interface {
+	ShowAll(adminReqeust AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse)
 	ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse) 
 }
 
@@ -27,15 +28,11 @@ func NewAdminService(aCtx *custom_models.AdminContext, db_pool *sqlx.DB) *AdminS
 }
 
 // Show All
-func (u *AdminService) ShowAll() (*AdminShowResponse, *error_response.ErrorResponse) {
-	return u.adminRepo.ShowAll()
+func (u *AdminService) ShowAll(adminReqeust AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse) {
+	return u.adminRepo.ShowAll(adminReqeust)
 }
 
 // Show One
 func (u *AdminService) ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse) {
-	success, err := u.adminRepo.ShowOne(id)
-	if err != nil {
-		return nil, err
-	}
-	return success, nil
+	return  u.adminRepo.ShowOne(id)
 }
