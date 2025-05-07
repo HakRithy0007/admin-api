@@ -211,6 +211,22 @@ func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
 			),
 		)
 	} else {
-		msg
+		msg, err_msg := translate.TranslateWithError(c, "admin_create_success")
+		if err_msg != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.NewResponseError(
+					err_msg.ErrorString(),
+					constants.Created_admin_success,
+					err_msg.Err,
+				),
+			)
+		}
+		return c.Status(fiber.StatusOK).JSON(
+			response.NewResponseError(
+				msg,
+				constants.Created_admin_success,
+				success,
+			),
+		)
 	}
 }
