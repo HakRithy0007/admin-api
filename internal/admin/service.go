@@ -10,6 +10,7 @@ import (
 type AdminCreator interface {
 	ShowAll(adminReqeust AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse)
 	ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse) 
+	CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminResponse, *error_response.ErrorResponse)
 }
 
 type AdminService struct {
@@ -35,4 +36,9 @@ func (u *AdminService) ShowAll(adminReqeust AdminShowRequest) (*AdminShowRespons
 // Show One
 func (u *AdminService) ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse) {
 	return  u.adminRepo.ShowOne(id)
+}
+
+// Create new admin
+func (u *AdminService) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminResponse, *error_response.ErrorResponse) {
+	return u.adminRepo.CreateNewAdmin(crreq)
 }

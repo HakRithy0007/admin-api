@@ -84,7 +84,7 @@ type TotalRecord struct {
 	Total int `db:"total"`
 }
 
-type CreateUserRequest struct{
+type CreateAdminRequest struct{
 	FirstName string `json:"first_name" validate:"required"`
 	LastName string `json:"last_name" validate:"required"`
 	AdminName string `json:"admin_name" validate:"required"`
@@ -96,7 +96,7 @@ type CreateUserRequest struct{
 	RoleID int `json:"role_id"`
 }
 
-func(u *CreateUserRequest) bind (c *fiber.Ctx, v *custom_validator.Validator) error {
+func(u *CreateAdminRequest) bind (c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.BodyParser(u); err != nil {
 		return err
 	}
@@ -104,4 +104,24 @@ func(u *CreateUserRequest) bind (c *fiber.Ctx, v *custom_validator.Validator) er
 		return err
 	}
 	return nil
+}
+
+type CreateAdminResponse struct {
+	Admin Admin `json:"admins"`
+}
+
+type NewAdmin struct {
+    ID           int       `db:"id"`
+    FirstName    string    `db:"first_name"`
+    LastName     string    `db:"last_name"`
+    Adminname     string    `db:"admin_name"`
+    Email        string    `db:"email"`
+    LoginSession *string   `db:"login_session"`
+    Phone        string    `db:"phone"`
+    Password     string    `db:"password"`
+    StatusID     int       `db:"status_id"`
+    OrderBy      int       `db:"order"`
+    CreatedAt    time.Time `db:"created_at"`
+    CreatedBy    int       `db:"created_by"`
+    RoleID       int       `db:"role_id"`
 }

@@ -167,7 +167,7 @@ func (u *AdminHandler) ShowOne(c *fiber.Ctx) error {
 
 // Create new admin 
 func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
-	var crreq CreateUserRequest
+	var crreq CreateAdminRequest
 	v := custom_validator.NewValidator()
 
 	if err := crreq.bind(c, v); err != nil {

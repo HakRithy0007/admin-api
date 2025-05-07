@@ -14,6 +14,7 @@ import (
 type AdminRepo interface {
 	ShowAll(adminRequest AdminShowRequest) (*AdminShowResponse, *error_response.ErrorResponse)
 	ShowOne(id int) (*AdminResponse, *error_response.ErrorResponse)
+	CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminResponse, *error_response.ErrorResponse)
 }
 
 type AdminRepoImpl struct {
@@ -144,4 +145,18 @@ func (u *AdminRepoImpl) ShowOne(id int) (*AdminResponse, *error_response.ErrorRe
 	return &AdminResponse{
 		AdminInfo: admin,
 	}, nil
+}
+
+// Create new admin
+func (u *AdminRepoImpl) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminResponse, *error_response.ErrorResponse) {
+
+	err_msg := &error_response.ErrorResponse{}
+
+	// Transaction
+	tx, err := u.db_pool.Beginx()
+	if err != nil {
+		custom_log.NewCustomLog("create_admin_failed", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("Create admin failed"))
+	}
+	var newAdmin = NewAdmin{}
 }
