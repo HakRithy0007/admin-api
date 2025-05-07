@@ -104,7 +104,7 @@ func (u *AdminHandler) ShowAll(c *fiber.Ctx) error {
 	}
 }
 
-// ShowOne
+// Show one
 func (u *AdminHandler) ShowOne(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 	id, err := strconv.Atoi(idParam)
@@ -163,4 +163,32 @@ func (u *AdminHandler) ShowOne(c *fiber.Ctx) error {
 				ressuccess,
 			))
 	}
+}
+
+// Create new admin 
+func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
+	var crreq CreateUserRequest
+	v := custom_validator.NewValidator()
+
+	if err := crreq.bind(c, v); err != nil {
+		msg, err_msg := translate.TranslateWithError(c, "invalid_request")
+		if err_msg != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.NewResponseError(
+					err_msg.ErrorString(),
+					constants.Translate_failed,
+					err_msg.Err,
+				),
+			)
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.NewResponseError(
+				msg,
+				constants.Invalid_request,
+				err,
+			),
+		)
+	}
+
+	service :=
 }

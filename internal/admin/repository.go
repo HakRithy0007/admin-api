@@ -39,13 +39,6 @@ func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowRespon
 	var limit_clause = fmt.Sprintf("LIMIT %d OFFSET %d", per_page, offset)
 	var sql_orderby = custom_sql.BuildSQLSort(adminRequest.Sort)
 
-	// Fix filters to use admin_role_name instead of user_role_name
-	for i, filter := range adminRequest.Filters {
-		if filter.Property == "r.user_role_name" {
-			adminRequest.Filters[i].Property = "r.admin_role_name"
-		}
-	}
-
 	sql_filters, args_filters := custom_sql.BuildSQLFilter(adminRequest.Filters)
 	if len(args_filters) > 0 {
 		sql_filters = "AND " + sql_filters

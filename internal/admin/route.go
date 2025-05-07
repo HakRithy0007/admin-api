@@ -26,8 +26,8 @@ func (u *AdminRoute) RegisterAdminRoute() *AdminRoute {
 
 	admin.Get("/", u.handler.ShowAll)
 	admin.Get("/:id", u.handler.ShowOne)
+	admin.Post("/create", u.handler.CreateNewAdmin)
 
-	// POST	/admin/logout	(Optional) Logout admin
 	// POST	/admins	Create new admin account
 	// GET	/admins	List all admin users
 	// GET	/admins/:id	Get details of an admin
