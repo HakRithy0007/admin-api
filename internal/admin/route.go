@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 )
@@ -27,6 +29,7 @@ func (u *AdminRoute) RegisterAdminRoute() *AdminRoute {
 	admin.Get("/", u.handler.ShowAll)
 	admin.Get("/:id", u.handler.ShowOne)
 	admin.Post("/create", u.handler.CreateNewAdmin)
+	fmt.Println("Hellow")
 
 	// POST	/admins	Create new admin account
 	// GET	/admins	List all admin users

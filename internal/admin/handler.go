@@ -166,6 +166,7 @@ func (u *AdminHandler) ShowOne(c *fiber.Ctx) error {
 }
 
 // Create new admin 
+// Create new admin 
 func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
 	var crreq CreateAdminRequest
 	v := custom_validator.NewValidator()
@@ -190,11 +191,11 @@ func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
 		)
 	}
 
-	service :=u.adminService(c)
+	service := u.adminService(c)
 	success, err := service.CreateNewAdmin(crreq)
 	if err != nil {
 		msg, err_msg := translate.TranslateWithError(c, err.MessageID)
-		if err_msg != nil{
+		if err_msg != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(
 				response.NewResponseError(
 					err_msg.ErrorString(),
@@ -207,7 +208,7 @@ func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
 			response.NewResponseError(
 				msg,
 				constants.Created_admin_failed,
-				err_msg.Err,
+				err.Err,  // This was the bug: using err_msg.Err instead of err.Err
 			),
 		)
 	} else {
@@ -216,13 +217,13 @@ func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(
 				response.NewResponseError(
 					err_msg.ErrorString(),
-					constants.Created_admin_success,
+					constants.Translate_failed,
 					err_msg.Err,
 				),
 			)
 		}
 		return c.Status(fiber.StatusOK).JSON(
-			response.NewResponseError(
+			response.NewResponse(
 				msg,
 				constants.Created_admin_success,
 				success,

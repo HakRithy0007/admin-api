@@ -3,8 +3,8 @@ package admin
 import (
 	"admin-phone-shop-api/pkg/custom_log"
 	custom_models "admin-phone-shop-api/pkg/model"
-	error_response "admin-phone-shop-api/pkg/utils/error"
 	custom_sql "admin-phone-shop-api/pkg/sql"
+	error_response "admin-phone-shop-api/pkg/utils/error"
 	"database/sql"
 	"fmt"
 
@@ -72,15 +72,15 @@ func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowRespon
 			AND r.deleted_at is NULL %s %s %s
 		`, sql_filters, sql_orderby, limit_clause)
 
-		var NewAdmin []Admin
+	var NewAdmin []Admin
 
-		err := u.db_pool.Select(&NewAdmin, query, args_filters...)
-		if err != nil {
-			custom_log.NewCustomLog("could_not_query", err.Error(), "error")
-			return nil, err_msg.NewErrorResponse("could_not_query", fmt.Errorf("can not select admin data the database is error"))
-		}
+	err := u.db_pool.Select(&NewAdmin, query, args_filters...)
+	if err != nil {
+		custom_log.NewCustomLog("could_not_query", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("could_not_query", fmt.Errorf("can not select admin data the database is error"))
+	}
 
-		totalQuery := fmt.Sprintf(`
+	totalQuery := fmt.Sprintf(`
 			SELECT
 				COUNT(*) as total
 				FROM 
@@ -92,18 +92,18 @@ func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowRespon
 				WHERE a.deleted_at IS NULL %s
 		`, sql_filters)
 
-		var total TotalRecord
+	var total TotalRecord
 
-		err = u.db_pool.Get(&total, totalQuery, args_filters...)
-		if err != nil {
-			custom_log.NewCustomLog("admin_show_failed", err.Error(), "error")
-			return nil, err_msg.NewErrorResponse("admin_show_failed", fmt.Errorf("can not select admin total the database error"))
-		}
+	err = u.db_pool.Get(&total, totalQuery, args_filters...)
+	if err != nil {
+		custom_log.NewCustomLog("admin_show_failed", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("admin_show_failed", fmt.Errorf("can not select admin total the database error"))
+	}
 
-		return &AdminShowResponse{
-			Admin: NewAdmin,
-			Total: total.Total,
-		}, nil
+	return &AdminShowResponse{
+		Admin: NewAdmin,
+		Total: total.Total,
+	}, nil
 }
 
 // Show One
@@ -156,9 +156,61 @@ func (u *AdminRepoImpl) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminRe
 	tx, err := u.db_pool.Beginx()
 	if err != nil {
 		custom_log.NewCustomLog("create_admin_failed", err.Error(), "error")
-		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("Create admin failed"))
+		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("create admin failed: %v", err))
 	}
+
 	var newAdmin = NewAdmin{}
-	
-	err = newAdmin.New
+
+	err = newAdmin.New(&crreq, u.adminCtx, u.db_pool)
+	if err != nil {
+		custom_log.NewCustomLog("create_admin_failed", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("create admin failed: %v", err))
+	}
+
+	query := `
+        INSERT INTO tbl_admin (
+            id, first_name, last_name, admin_name, email, phone, password, status_id, "order", created_by, created_at, role_id
+        ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+        )
+        RETURNING id, first_name, last_name, admin_name, email, login_session, phone, password,
+                status_id, created_at, created_by, deleted_at, role_id, '' AS admin_role_name, $10 AS operator;
+    `
+
+	var admin Admin
+	err = tx.QueryRowx(query,
+		newAdmin.ID,
+		newAdmin.FirstName,
+		newAdmin.LastName,
+		newAdmin.AdminName,
+		newAdmin.Email,
+		newAdmin.Phone,
+		newAdmin.Password,
+		newAdmin.StatusID,
+		newAdmin.OrderBy,
+		newAdmin.CreatedBy,
+		newAdmin.CreatedAt,
+		newAdmin.RoleID,
+	).StructScan(&admin)
+
+	if err != nil {
+		custom_log.NewCustomLog("create_admin_failed", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("create admin failed: %v", err))
+	}
+
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
+		custom_log.NewCustomLog("create_admin_commit_failed", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("commit failed: %v", err))
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	return &CreateAdminResponse{
+		Admin: admin,
+	}, nil
 }

@@ -1,13 +1,17 @@
 package admin
 
 import (
+	"admin-phone-shop-api/pkg/custom_log"
 	model "admin-phone-shop-api/pkg/model"
+	"admin-phone-shop-api/pkg/sql"
 	custom_validator "admin-phone-shop-api/pkg/validator"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -62,7 +66,7 @@ type Admin struct {
 	ID            int     `db:"id" json:"id"`
 	FirstName     string  `db:"first_name" json:"first_name"`
 	LastName      string  `db:"last_name" json:"last_name"`
-	Username      string  `db:"user_name" json:"username"`
+	AdminName      string  `db:"user_name" json:"admin_name"`
 	Email         string  `db:"email" json:"email"`
 	LoginSession  *string `db:"login_session" json:"-"`
 	Phone         string  `db:"phone" json:"phone"`
@@ -89,8 +93,8 @@ type CreateAdminRequest struct {
 	FirstName       string `json:"first_name" validate:"required"`
 	LastName        string `json:"last_name" validate:"required"`
 	AdminName       string `json:"admin_name" validate:"required"`
-	Password        string `json:"password" validate:"required, min=6"`
-	PasswordConfirm string `json:"password_confirm" validate:"required, min=6"`
+	Password        string `json:"password" validate:"required,min=6"`
+	PasswordConfirm string `json:"password_confirm" validate:"required,min=6"`
 	Email           string `json:"email" validate:"required,email"`
 	Phone           string `json:"phone"`
 	StatusID        int    `json:"status_id"`
@@ -115,7 +119,7 @@ type NewAdmin struct {
 	ID           int       `db:"id"`
 	FirstName    string    `db:"first_name"`
 	LastName     string    `db:"last_name"`
-	Adminname    string    `db:"admin_name"`
+	AdminName    string    `db:"admin_name"`
 	Email        string    `db:"email"`
 	LoginSession *string   `db:"login_session"`
 	Phone        string    `db:"phone"`
@@ -128,8 +132,56 @@ type NewAdmin struct {
 }
 
 func (u *NewAdmin) New(createAdminReq *CreateAdminRequest, uCtx *model.AdminContext, db_pool *sqlx.DB) error {
-	
+
 	if uCtx.RoleID > createAdminReq.RoleID {
 		return fmt.Errorf("failed you role can not create this admin")
 	}
+
+	login_session, err := uuid.NewV7()
+	if err != nil {
+		custom_log.NewCustomLog("get_uuid_failed", err.Error(), "error")
+		return err
+	}
+
+	sessionString := login_session.String()
+	app_timezone := os.Getenv("TIME_ZONE")
+	location, err := time.LoadLocation(app_timezone)
+	if err != nil {
+		return fmt.Errorf("failed to load location: %w", err)
+	}
+	local_now := time.Now().In(location)
+
+	is_adminName, err := sql.IsExits("tbl_admin", "admin_name", createAdminReq.AdminName, db_pool)
+	if err != nil {
+		return err
+	} else {
+		if is_adminName {
+			return fmt.Errorf("%s", fmt.Sprintf("admin name:`%s` already exists", createAdminReq.AdminName))
+		}
+	}
+
+	createdByID, err := sql.GetAdminIdByField("tbl_admin", "user_name", uCtx.Admin_Name, db_pool)
+	if err != nil {
+		return err
+	}
+
+	orderValue, err := sql.GetSeqNextVal("tbl_admin_id_seq", db_pool)
+	if err != nil {
+		return fmt.Errorf("failed to generate order value: %w", err)
+	}
+
+	u.FirstName = createAdminReq.FirstName
+	u.LastName = createAdminReq.LastName
+	u.AdminName = createAdminReq.AdminName
+	u.Password = createAdminReq.Password
+	u.Email = createAdminReq.Email
+	u.LoginSession = &sessionString
+	u.StatusID = 1
+	u.OrderBy = *orderValue
+	u.Phone = createAdminReq.Phone
+	u.CreatedBy = *createdByID
+	u.CreatedAt = local_now
+	u.RoleID = createAdminReq.RoleID
+
+	return nil
 }
