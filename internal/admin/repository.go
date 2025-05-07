@@ -51,7 +51,7 @@ func (u *AdminRepoImpl) ShowAll(adminRequest AdminShowRequest) (*AdminShowRespon
 			a.id,
 			a.first_name,
 			a.last_name,
-			a.admin_name AS user_name,
+			a.admin_name,
 			a.email,
 			a.phone,
 			a.status_id,
@@ -149,7 +149,6 @@ func (u *AdminRepoImpl) ShowOne(id int) (*AdminResponse, *error_response.ErrorRe
 
 // Create new admin
 func (u *AdminRepoImpl) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminResponse, *error_response.ErrorResponse) {
-
 	err_msg := &error_response.ErrorResponse{}
 
 	// Transaction
@@ -159,22 +158,39 @@ func (u *AdminRepoImpl) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminRe
 		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("create admin failed: %v", err))
 	}
 
+	// Make sure to rollback if there's an error
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
 	var newAdmin = NewAdmin{}
 
+	// Get next sequence value for admin ID
+	nextID, err := custom_sql.GetSeqNextVal("tbl_admin_id_seq", u.db_pool)
+	if err != nil {
+		custom_log.NewCustomLog("create_admin_failed", err.Error(), "error")
+		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("failed to get sequence: %v", err))
+	}
+
+	// Initialize the new admin with the request data and explicit ID
 	err = newAdmin.New(&crreq, u.adminCtx, u.db_pool)
 	if err != nil {
 		custom_log.NewCustomLog("create_admin_failed", err.Error(), "error")
 		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("create admin failed: %v", err))
 	}
 
+	// Explicitly set the ID from the sequence
+	newAdmin.ID = *nextID
+
+	// Modified query to use RETURNING clause
 	query := `
         INSERT INTO tbl_admin (
             id, first_name, last_name, admin_name, email, phone, password, status_id, "order", created_by, created_at, role_id
         ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
-        )
-        RETURNING id, first_name, last_name, admin_name, email, login_session, phone, password,
-                status_id, created_at, created_by, deleted_at, role_id, '' AS admin_role_name, $10 AS operator;
+        ) RETURNING id, first_name, last_name, admin_name, email, phone, status_id, created_at, created_by, role_id
     `
 
 	var admin Admin
@@ -203,12 +219,6 @@ func (u *AdminRepoImpl) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminRe
 		custom_log.NewCustomLog("create_admin_commit_failed", err.Error(), "error")
 		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("commit failed: %v", err))
 	}
-
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
 
 	return &CreateAdminResponse{
 		Admin: admin,

@@ -3,7 +3,7 @@ package admin
 import (
 	"admin-phone-shop-api/pkg/custom_log"
 	model "admin-phone-shop-api/pkg/model"
-	"admin-phone-shop-api/pkg/sql"
+	sql "admin-phone-shop-api/pkg/sql"
 	custom_validator "admin-phone-shop-api/pkg/validator"
 	"fmt"
 	"os"
@@ -66,7 +66,7 @@ type Admin struct {
 	ID            int     `db:"id" json:"id"`
 	FirstName     string  `db:"first_name" json:"first_name"`
 	LastName      string  `db:"last_name" json:"last_name"`
-	AdminName      string  `db:"user_name" json:"admin_name"`
+	AdminName      string  `db:"admin_name" json:"admin_name"`
 	Email         string  `db:"email" json:"email"`
 	LoginSession  *string `db:"login_session" json:"-"`
 	Phone         string  `db:"phone" json:"phone"`
@@ -93,11 +93,10 @@ type CreateAdminRequest struct {
 	FirstName       string `json:"first_name" validate:"required"`
 	LastName        string `json:"last_name" validate:"required"`
 	AdminName       string `json:"admin_name" validate:"required"`
-	Password        string `json:"password" validate:"required,min=6"`
-	PasswordConfirm string `json:"password_confirm" validate:"required,min=6"`
+	Password        string `json:"password" validate:"required"`
+	PasswordConfirm string `json:"password_confirm" validate:"required,eqfield=Password"`
 	Email           string `json:"email" validate:"required,email"`
 	Phone           string `json:"phone"`
-	StatusID        int    `json:"status_id"`
 	RoleID          int    `json:"role_id"`
 }
 
@@ -132,9 +131,14 @@ type NewAdmin struct {
 }
 
 func (u *NewAdmin) New(createAdminReq *CreateAdminRequest, uCtx *model.AdminContext, db_pool *sqlx.DB) error {
+	// Check for missing role_id in the request
+	if createAdminReq.RoleID == 0 {
+		// Default to a standard user role (adjust the value based on your system)
+		createAdminReq.RoleID = 2 // Assuming 2 is a standard user role
+	}
 
 	if uCtx.RoleID > createAdminReq.RoleID {
-		return fmt.Errorf("failed you role can not create this admin")
+		return fmt.Errorf("failed: your role cannot create this admin")
 	}
 
 	login_session, err := uuid.NewV7()
@@ -160,7 +164,7 @@ func (u *NewAdmin) New(createAdminReq *CreateAdminRequest, uCtx *model.AdminCont
 		}
 	}
 
-	createdByID, err := sql.GetAdminIdByField("tbl_admin", "user_name", uCtx.Admin_Name, db_pool)
+	createdByID, err := sql.GetAdminIdByField("tbl_admin", "admin_name", uCtx.Admin_Name, db_pool)
 	if err != nil {
 		return err
 	}
