@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jmoiron/sqlx"
 )
 
 type AdminResponse struct {
@@ -58,49 +59,49 @@ func (u *AdminShowRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) err
 }
 
 type Admin struct {
-	ID           int     `db:"id" json:"id"`
-	FirstName    string  `db:"first_name" json:"first_name"`
-	LastName     string  `db:"last_name" json:"last_name"`
-	Username     string  `db:"user_name" json:"username"`
-	Email        string  `db:"email" json:"email"`
-	LoginSession *string `db:"login_session" json:"-"`
-	Phone        string  `db:"phone" json:"phone"`
-	Password     string  `db:"password" json:"-"`
-	StatusID     int     `db:"status_id" json:"status_id"`
-	CreatedAt    string  `db:"created_at" json:"created_at"`
-	CreatedBy    int     `db:"created_by" json:"created_by"`
-	DeletedAt    *string `db:"deleted_at" json:"-"`
-	RoleID       int     `db:"role_id" json:"role_id"`
+	ID            int     `db:"id" json:"id"`
+	FirstName     string  `db:"first_name" json:"first_name"`
+	LastName      string  `db:"last_name" json:"last_name"`
+	Username      string  `db:"user_name" json:"username"`
+	Email         string  `db:"email" json:"email"`
+	LoginSession  *string `db:"login_session" json:"-"`
+	Phone         string  `db:"phone" json:"phone"`
+	Password      string  `db:"password" json:"-"`
+	StatusID      int     `db:"status_id" json:"status_id"`
+	CreatedAt     string  `db:"created_at" json:"created_at"`
+	CreatedBy     int     `db:"created_by" json:"created_by"`
+	DeletedAt     *string `db:"deleted_at" json:"-"`
+	RoleID        int     `db:"role_id" json:"role_id"`
 	AdminRoleName string  `db:"admin_role_name" json:"admin_role_name"`
-	Operator     string  `json:"operator" db:"operator"`
+	Operator      string  `json:"operator" db:"operator"`
 }
 
 type AdminShowResponse struct {
 	Admin []Admin `json:"admins"`
-	Total int `json:"-"`
+	Total int     `json:"-"`
 }
 
 type TotalRecord struct {
 	Total int `db:"total"`
 }
 
-type CreateAdminRequest struct{
-	FirstName string `json:"first_name" validate:"required"`
-	LastName string `json:"last_name" validate:"required"`
-	AdminName string `json:"admin_name" validate:"required"`
-	Password string `json:"password" validate:"required, min=6"`
+type CreateAdminRequest struct {
+	FirstName       string `json:"first_name" validate:"required"`
+	LastName        string `json:"last_name" validate:"required"`
+	AdminName       string `json:"admin_name" validate:"required"`
+	Password        string `json:"password" validate:"required, min=6"`
 	PasswordConfirm string `json:"password_confirm" validate:"required, min=6"`
-	Email string `json:"email" validate:"required,email"`
-	Phone string `json:"phone"`
-	StatusID int `json:"status_id"`
-	RoleID int `json:"role_id"`
+	Email           string `json:"email" validate:"required,email"`
+	Phone           string `json:"phone"`
+	StatusID        int    `json:"status_id"`
+	RoleID          int    `json:"role_id"`
 }
 
-func(u *CreateAdminRequest) bind (c *fiber.Ctx, v *custom_validator.Validator) error {
+func (u *CreateAdminRequest) bind(c *fiber.Ctx, v *custom_validator.Validator) error {
 	if err := c.BodyParser(u); err != nil {
 		return err
 	}
-	if err := v.Validate(u); err != nil{
+	if err := v.Validate(u); err != nil {
 		return err
 	}
 	return nil
@@ -111,17 +112,24 @@ type CreateAdminResponse struct {
 }
 
 type NewAdmin struct {
-    ID           int       `db:"id"`
-    FirstName    string    `db:"first_name"`
-    LastName     string    `db:"last_name"`
-    Adminname     string    `db:"admin_name"`
-    Email        string    `db:"email"`
-    LoginSession *string   `db:"login_session"`
-    Phone        string    `db:"phone"`
-    Password     string    `db:"password"`
-    StatusID     int       `db:"status_id"`
-    OrderBy      int       `db:"order"`
-    CreatedAt    time.Time `db:"created_at"`
-    CreatedBy    int       `db:"created_by"`
-    RoleID       int       `db:"role_id"`
+	ID           int       `db:"id"`
+	FirstName    string    `db:"first_name"`
+	LastName     string    `db:"last_name"`
+	Adminname    string    `db:"admin_name"`
+	Email        string    `db:"email"`
+	LoginSession *string   `db:"login_session"`
+	Phone        string    `db:"phone"`
+	Password     string    `db:"password"`
+	StatusID     int       `db:"status_id"`
+	OrderBy      int       `db:"order"`
+	CreatedAt    time.Time `db:"created_at"`
+	CreatedBy    int       `db:"created_by"`
+	RoleID       int       `db:"role_id"`
+}
+
+func (u *NewAdmin) New(createAdminReq *CreateAdminRequest, uCtx *model.AdminContext, db_pool *sqlx.DB) error {
+	
+	if uCtx.RoleID > createAdminReq.RoleID {
+		return fmt.Errorf("failed you role can not create this admin")
+	}
 }

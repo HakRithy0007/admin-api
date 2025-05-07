@@ -159,4 +159,6 @@ func (u *AdminRepoImpl) CreateNewAdmin(crreq CreateAdminRequest) (*CreateAdminRe
 		return nil, err_msg.NewErrorResponse("create_admin_failed", fmt.Errorf("Create admin failed"))
 	}
 	var newAdmin = NewAdmin{}
+	
+	err = newAdmin.New
 }
