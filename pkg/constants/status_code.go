@@ -14,8 +14,8 @@ const (
 	Show_admin_success      = 3307
 
 	Show_admin_Failed    = 3308
-	Created_user_failed  = 7363
-	Created_user_success = 4557
+	Created_admin_failed  = 7363
+	Created_admin_success = 4557
 
 	Logout_invalid = 8372
 	Logout_success = 7123

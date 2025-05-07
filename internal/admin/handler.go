@@ -190,5 +190,27 @@ func (u *AdminHandler) CreateNewAdmin(c *fiber.Ctx) error {
 		)
 	}
 
-	service :=
+	service :=u.adminService(c)
+	success, err := service.CreateNewAdmin(crreq)
+	if err != nil {
+		msg, err_msg := translate.TranslateWithError(c, err.MessageID)
+		if err_msg != nil{
+			return c.Status(fiber.StatusBadRequest).JSON(
+				response.NewResponseError(
+					err_msg.ErrorString(),
+					constants.Translate_failed,
+					err_msg.Err,
+				),
+			)
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(
+			response.NewResponseError(
+				msg,
+				constants.Created_admin_failed,
+				err_msg.Err,
+			),
+		)
+	} else {
+		msg
+	}
 }
